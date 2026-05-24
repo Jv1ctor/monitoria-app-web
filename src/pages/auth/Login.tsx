@@ -51,6 +51,9 @@ export const LoginPage = () => {
     } else if (matricula === "1111111" && senha === "monitor123") {
       toast.success("Bem-vindo, Monitor!")
       navigate("/") // rota de monitoria
+    } else if(matricula === "0000000" && senha === "admin123"){
+        toast.success("Bem vindo, Monitor!")
+        navigate("/")
     } else {
       toast.error("Matrícula ou senha inválida. Tente novamente.")
     }
