@@ -143,11 +143,6 @@ export const LoginPage = () => {
                     Cadastre-se aqui
                   </NavLink>
                 </p>
-                <p className="text-[11px] text-muted-foreground font-medium">
-                  Outro perfil?{" "}
-                  <span className="text-primary cursor-pointer hover:underline">Monitor</span> ·{" "}
-                  <span className="text-primary cursor-pointer hover:underline">Coordenação</span>
-                </p>
               </div>
 
             </FieldGroup>
