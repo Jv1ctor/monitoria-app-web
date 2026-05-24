@@ -4,6 +4,7 @@ import { Example } from "./pages/Example"
 import { PublicLayout } from "./components/layout/public-layout"
 import { LoginPage } from "./pages/auth/Login"
 import { RegisterPage } from "./pages/auth/Register"
+import { RecoverPasswordPage } from "./pages/auth/RecoverPassword"
 
 export const router = createBrowserRouter([
   {
@@ -19,6 +20,10 @@ export const router = createBrowserRouter([
   {
     path: "/Register",
     element: <RegisterPage />
+  },
+  {
+    path: "/recover",
+    element: <RecoverPasswordPage/>,
   },
   {
     path: "/ds",
