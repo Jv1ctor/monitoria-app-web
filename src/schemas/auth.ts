@@ -4,7 +4,7 @@ export const loginSchema = z.object({
   matricula: z
     .string()
     .min(1, "A matrícula é obrigatória")
-    .regex(/^\d{7,8}$/, "A matrícula Unifor deve conter exatamente 7 números"),
+    .regex(/^\d{7}$/, "A matrícula deve conter exatamente 7 números"),
   senha: z
     .string()
     .min(6, "A senha deve ter pelo menos 6 caracteres"),
