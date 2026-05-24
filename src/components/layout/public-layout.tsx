@@ -3,47 +3,47 @@ import { Button } from "../ui/button"
 import { Topbar } from "./topbar"
 import { Footer } from "./footer"
 import { List } from "lucide-react"
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet"
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTrigger,
+} from "../ui/sheet"
+import { Outlet } from "react-router"
 
 function PublicLayout() {
   return (
     <div className="flex flex-col">
-
       <Topbar
         className="mx-0 md:mx-25"
         actions={
           <div className="flex flex-row items-center lg:gap-4">
             <div className="hidden lg:flex items-center gap-4">
-              <Button variant='ghost'>
-                <NavLink to={'/login'}>
-                  Entrar
-                </NavLink>
+              <Button variant="ghost">
+                <NavLink to={"/login"}>Entrar</NavLink>
               </Button>
               <Button>
-                <NavLink to={'/register'}>
-                  Cadastrar
-                </NavLink>
+                <NavLink to={"/register"}>Cadastrar</NavLink>
               </Button>
             </div>
             <div className="flex lg:hidden justify-start md:justify-between">
               <Sheet>
                 <SheetTrigger asChild>
                   <Button>
-                    <List size={20}/>
+                    <List size={20} />
                   </Button>
                 </SheetTrigger>
-                <SheetContent>
+                <SheetContent side="top">
                   <SheetHeader>
-                    <SheetTitle>Navegação</SheetTitle>
-                    <SheetDescription>Navegue entre as paginas de autenticação</SheetDescription>
-                    <div className="flex flex-col justify-center gap-10">
+                    <div className="flex flex-col justify-center items-center gap-5">
                       <SheetClose asChild>
-                        <NavLink to={'/ds'}>
+                        <NavLink to={"/ds"}>
                           <Button variant="outline">Entrar</Button>
                         </NavLink>
                       </SheetClose>
                       <SheetClose asChild>
-                        <NavLink to={'/ds'}>
+                        <NavLink to={"/ds"}>
                           <Button>Cadastrar</Button>
                         </NavLink>
                       </SheetClose>
@@ -53,9 +53,14 @@ function PublicLayout() {
               </Sheet>
             </div>
           </div>
-        }/>
-        {/* Outlet */}
-      <Footer/>
+        }
+      />
+
+      <main>
+        <Outlet />
+      </main>
+
+      <Footer />
     </div>
   )
 }
