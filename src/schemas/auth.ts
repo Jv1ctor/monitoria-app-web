@@ -30,3 +30,13 @@ export const cadastroSchema = z.object({
   message: "As senhas não coincidem",
   path: ["confirmarSenha"],
 })
+
+export const recuperarSenhaSchema = z.object({
+  email: z
+    .string()
+    .min(1, "E-mail é obrigatório")
+    .email("Insira um e-mail institucional válido")
+    .refine((email) => email.endsWith("@edu.unifor.br") || email.endsWith("@unifor.br"), {
+      message: "Utilize seu e-mail da Unifor (@edu.unifor.br)",
+    }),
+})
