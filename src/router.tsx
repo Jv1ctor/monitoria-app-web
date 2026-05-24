@@ -3,6 +3,7 @@ import { DesignSystem } from "./pages/DesignSystem"
 import { Example } from "./pages/Example"
 import { PublicLayout } from "./components/layout/public-layout"
 import { LoginPage } from "./pages/auth/Login"
+import { RegisterPage } from "./pages/auth/Register"
 
 export const router = createBrowserRouter([
   {
@@ -14,6 +15,10 @@ export const router = createBrowserRouter([
   {
     path: "/Login",
     element: <LoginPage />,
+  },
+  {
+    path: "/Register",
+    element: <RegisterPage />
   },
   {
     path: "/ds",
