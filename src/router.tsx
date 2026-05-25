@@ -14,11 +14,11 @@ export const router = createBrowserRouter([
     loader: () => console.log("Executa sempre quando carrega uma page"),
   },
   {
-    path: "/Login",
+    path: "/login",
     element: <LoginPage />,
   },
   {
-    path: "/Register",
+    path: "/register",
     element: <RegisterPage />
   },
   {

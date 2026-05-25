@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-import { cadastroSchema } from "@/schemas/auth"
+import { registerSchema } from "@/schemas/auth"
 
 export function RegisterPage() {
   const navigate = useNavigate()
@@ -17,28 +17,28 @@ export function RegisterPage() {
   const [isLoading, setIsLoading] = React.useState(false)
   const [isSuccess, setIsSuccess] = React.useState(false)
   const [formErrors, setFormErrors] = React.useState<Record<string, string>>({})
-  const [cursoSelecionado, setCursoSelecionado] = React.useState("")
+  const [selectedCourse, setSelectedCourse] = React.useState("")
 
-  const nomeRef = React.useRef<HTMLInputElement>(null)
-  const matriculaRef = React.useRef<HTMLInputElement>(null)
+  const nameRef = React.useRef<HTMLInputElement>(null)
+  const enrollmentRef = React.useRef<HTMLInputElement>(null)
   const emailRef = React.useRef<HTMLInputElement>(null)
-  const senhaRef = React.useRef<HTMLInputElement>(null)
-  const confirmarSenhaRef = React.useRef<HTMLInputElement>(null)
+  const passwordRef = React.useRef<HTMLInputElement>(null)
+  const confirmPasswordRef = React.useRef<HTMLInputElement>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setFormErrors({}) 
 
     const data = {
-      nome: nomeRef.current?.value || "",
-      matricula: matriculaRef.current?.value || "",
-      curso: cursoSelecionado,
+      name: nameRef.current?.value || "",
+      enrollment: enrollmentRef.current?.value || "",
+      course: selectedCourse,
       email: emailRef.current?.value || "",
-      senha: senhaRef.current?.value || "",
-      confirmarSenha: confirmarSenhaRef.current?.value || "",
+      password: passwordRef.current?.value || "",
+      confirmPassword: confirmPasswordRef.current?.value || "",
     }
 
-    const result = cadastroSchema.safeParse(data)
+    const result = registerSchema.safeParse(data)
 
     if (!result.success) {
       const errors: Record<string, string> = {}
@@ -110,28 +110,28 @@ export function RegisterPage() {
               <Field>
                 <FieldLabel>Nome Completo</FieldLabel>
                 <Input
-                  ref={nomeRef}
+                  ref={nameRef}
                   placeholder="Digite seu nome completo"
-                  className={formErrors.nome ? "border-destructive focus-visible:ring-destructive/30" : ""}
+                  className={formErrors.name ? "border-destructive focus-visible:ring-destructive/30" : ""}
                 />
-                {formErrors.nome && <FieldError errors={[{ message: formErrors.nome }]} />}
+                {formErrors.name && <FieldError errors={[{ message: formErrors.name }]} />}
               </Field>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <Field>
                   <FieldLabel>Matrícula</FieldLabel>
                   <Input
-                    ref={matriculaRef}
+                    ref={enrollmentRef}
                     placeholder="Digite sua matrícula"
-                    className={formErrors.matricula ? "border-destructive focus-visible:ring-destructive/30" : ""}
+                    className={formErrors.enrollment ? "border-destructive focus-visible:ring-destructive/30" : ""}
                   />
-                  {formErrors.matricula && <FieldError errors={[{ message: formErrors.matricula }]} />}
+                  {formErrors.enrollment && <FieldError errors={[{ message: formErrors.enrollment }]} />}
                 </Field>
 
                 <Field>
                   <FieldLabel>Curso</FieldLabel>
-                  <Select onValueChange={setCursoSelecionado}>
-                    <SelectTrigger className={formErrors.curso ? "border-destructive focus-visible:ring-destructive/30" : ""}>
+                  <Select onValueChange={setSelectedCourse}>
+                    <SelectTrigger className={formErrors.course ? "border-destructive focus-visible:ring-destructive/30" : ""}>
                       <SelectValue placeholder="Selecione..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -144,7 +144,7 @@ export function RegisterPage() {
                       <SelectItem value="em">Engenharia Mecânica</SelectItem>
                     </SelectContent>
                   </Select>
-                  {formErrors.curso && <FieldError errors={[{ message: formErrors.curso }]} />}
+                  {formErrors.course && <FieldError errors={[{ message: formErrors.course }]} />}
                 </Field>
               </div>
 
@@ -162,23 +162,23 @@ export function RegisterPage() {
                 <Field>
                   <FieldLabel>Senha</FieldLabel>
                   <Input
-                    ref={senhaRef}
+                    ref={passwordRef}
                     type="password"
                     placeholder="Crie uma senha"
-                    className={formErrors.senha ? "border-destructive focus-visible:ring-destructive/30" : ""}
+                    className={formErrors.password ? "border-destructive focus-visible:ring-destructive/30" : ""}
                   />
-                  {formErrors.senha && <FieldError errors={[{ message: formErrors.senha }]} />}
+                  {formErrors.password && <FieldError errors={[{ message: formErrors.password }]} />}
                 </Field>
 
                 <Field>
                   <FieldLabel>Confirmar Senha</FieldLabel>
                   <Input
-                    ref={confirmarSenhaRef}
+                    ref={confirmPasswordRef}
                     type="password"
                     placeholder="Confirme a senha"
-                    className={formErrors.confirmarSenha ? "border-destructive focus-visible:ring-destructive/30" : ""}
+                    className={formErrors.confirmPassword ? "border-destructive focus-visible:ring-destructive/30" : ""}
                   />
-                  {formErrors.confirmarSenha && <FieldError errors={[{ message: formErrors.confirmarSenha }]} />}
+                  {formErrors.confirmPassword && <FieldError errors={[{ message: formErrors.confirmPassword }]} />}
                 </Field>
               </div>
 

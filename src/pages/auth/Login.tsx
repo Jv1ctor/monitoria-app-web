@@ -12,28 +12,27 @@ import { loginSchema } from "@/schemas/auth"
 export const LoginPage = () => {
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = React.useState(false)
-  const [formErrors, setFormErrors] = React.useState<{ matricula?: string; senha?: string }>({})
+  const [formErrors, setFormErrors] = React.useState<{ enrollment?: string; password?: string }>({})
 
-  const matriculaRef = React.useRef<HTMLInputElement>(null)
-  const senhaRef = React.useRef<HTMLInputElement>(null)
+  const enrollmentRef = React.useRef<HTMLInputElement>(null)
+  const passwordRef = React.useRef<HTMLInputElement>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setFormErrors({})
 
     const data = {
-      matricula: matriculaRef.current?.value || "",
-      senha: senhaRef.current?.value || "",
+      enrollment: enrollmentRef.current?.value || "",
+      password: passwordRef.current?.value || "",
     }
-
 
     const result = loginSchema.safeParse(data)
 
     if (!result.success) {
       const errors: typeof formErrors = {}
       result.error.issues.forEach((issue) => {
-        if (issue.path[0] === "matricula") errors.matricula = issue.message
-        if (issue.path[0] === "senha") errors.senha = issue.message
+        if (issue.path[0] === "enrollment") errors.enrollment = issue.message
+        if (issue.path[0] === "password") errors.password = issue.message
       })
       setFormErrors(errors)
       return
@@ -43,17 +42,17 @@ export const LoginPage = () => {
 
     await new Promise((resolve) => setTimeout(resolve, 1200))
 
-    const { matricula, senha } = result.data
+    const { enrollment, password } = result.data
 
-    if (matricula === "2222222" && senha === "aluno123") {
+    if (enrollment === "2222222" && password === "aluno123") {
       toast.success("Login efetuado com sucesso!")
-      navigate("/") // redireciona o estudante pro dashboard 
-    } else if (matricula === "1111111" && senha === "monitor123") {
+      navigate("/") 
+    } else if (enrollment === "1111111" && password === "monitor123") {
       toast.success("Bem-vindo, Monitor!")
-      navigate("/") // rota de monitoria
-    } else if(matricula === "0000000" && senha === "admin123"){
-        toast.success("Bem vindo, Monitor!")
-        navigate("/")
+      navigate("/") 
+    } else if (enrollment === "0000000" && password === "admin123") {
+      toast.success("Bem vindo, Coordenador!")
+      navigate("/")
     } else {
       toast.error("Matrícula ou senha inválida. Tente novamente.")
     }
@@ -84,22 +83,22 @@ export const LoginPage = () => {
               <Field>
                 <FieldLabel>Matrícula</FieldLabel>
                 <Input
-                  ref={matriculaRef}
+                  ref={enrollmentRef}
                   placeholder="Digite sua matrícula"
-                  className={formErrors.matricula ? "border-destructive focus-visible:ring-destructive/30" : ""}
+                  className={formErrors.enrollment ? "border-destructive focus-visible:ring-destructive/30" : ""}
                 />
-                {formErrors.matricula && <FieldError errors={[{ message: formErrors.matricula }]} />}
+                {formErrors.enrollment && <FieldError errors={[{ message: formErrors.enrollment }]} />}
               </Field>
 
               <Field>
                 <FieldLabel>Senha</FieldLabel>
                 <Input
-                  ref={senhaRef}
+                  ref={passwordRef}
                   type="password"
                   placeholder="Digite sua senha"
-                  className={formErrors.senha ? "border-destructive focus-visible:ring-destructive/30" : ""}
+                  className={formErrors.password ? "border-destructive focus-visible:ring-destructive/30" : ""}
                 />
-                {formErrors.senha && <FieldError errors={[{ message: formErrors.senha }]} />}
+                {formErrors.password && <FieldError errors={[{ message: formErrors.password }]} />}
               </Field>
 
               <div className="flex items-center justify-between">

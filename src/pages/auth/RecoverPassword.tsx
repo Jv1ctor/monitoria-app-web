@@ -1,13 +1,13 @@
 import * as React from "react"
 import { NavLink } from "react-router"
-import { Book, Loader2, Send } from "lucide-react"
+import { Book, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field"
-import { recuperarSenhaSchema } from "@/schemas/auth"
+import { recoverPasswordSchema } from "@/schemas/auth"
 
 export function RecoverPasswordPage() {
   const [isLoading, setIsLoading] = React.useState(false)
@@ -24,7 +24,7 @@ export function RecoverPasswordPage() {
       email: emailRef.current?.value || "",
     }
 
-    const result = recuperarSenhaSchema.safeParse(data)
+    const result = recoverPasswordSchema.safeParse(data)
 
     if (!result.success) {
       setFormError(result.error.issues[0].message)
@@ -52,9 +52,6 @@ export function RecoverPasswordPage() {
 
         <Card className="w-full max-w-[440px] shadow-card border-border rounded-lg text-center">
           <CardContent className="p-10 flex flex-col items-center">
-            <div className="size-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-6">
-              <Send size={28} />
-            </div>
             <h2 className="text-2xl font-bold text-foreground mb-2">E-mail Enviado!</h2>
             <p className="text-sm text-muted-foreground mb-8">
               Se o e-mail informado estiver cadastrado em nosso sistema, enviamos um link de redefinição de senha para a sua caixa de entrada.
