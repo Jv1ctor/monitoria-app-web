@@ -40,3 +40,9 @@ export const recoverPasswordSchema = z.object({
       message: "Utilize seu e-mail da Unifor (@edu.unifor.br)",
     }),
 })
+
+export const createTopicSchema = z.object({
+  course: z.string().min(1, "Selecione uma disciplina"),
+  title: z.string().min(1, "O título do tópico é obrigatório"),
+  content: z.string().min(1, "A mensagem do tópico é obrigatória"),
+})
