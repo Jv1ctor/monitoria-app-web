@@ -17,8 +17,8 @@ export const router = createBrowserRouter([
     element: <DesignSystem />,
   },
   {
-    path: "/student/dashboard",
+    path: "/student",
     element: <DashboardLayout />,
-    children: [{ index: true, element: <Dashboard /> }],
+    children: [{ path: "dashboard", index: true, element: <Dashboard /> }],
   }
 ])

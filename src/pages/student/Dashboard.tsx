@@ -5,18 +5,12 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/shared/empty-state"
 import { Badge } from "@/components/ui/badge"
+import type { Monitoring } from "@/types/student/Monitoring.type"
+import { formatData, formatHora, hoje } from "@/lib/data-format.lib"
 
-type Monitoria = {
-    id: number;
-    disciplina: string;
-    monitorNome: string;
-    monitorIniciais: string;
-    monitorAvatarUrl?: string;
-    dataISO: string;  //todo: verificar formato
 
-}
 
-const MOCK_MONITORIAS: Monitoria[] = [
+const MOCK_MONITORING: Monitoring[] = [
     {
         id: 1,
         disciplina: "Calculo I",
@@ -41,35 +35,12 @@ const MOCK_MONITORIAS: Monitoria[] = [
     },
 ]
 
-const formatData = (dataISO: string) =>
-    new Intl.DateTimeFormat("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-    }).format(new Date(dataISO))
 
-const formatHora = (dataISO: string) =>
-    new Intl.DateTimeFormat("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-    }).format(new Date(dataISO))
-
-const hoje = (dataISO: string) => {
-    const data = new Date(dataISO)
-    const hoje = new Date()
-
-    return (
-        data.getDate() === hoje.getDate() &&
-        data.getMonth() === hoje.getMonth() &&
-        data.getFullYear() === hoje.getFullYear()
-    )
-}
 
 
 const Dashboard = () => {
     const monitoriasOrdenadas = useMemo(() => {
-        return [...MOCK_MONITORIAS].sort((a, b) => new Date(b.dataISO).getTime() - new Date(a.dataISO).getTime())
+        return [...MOCK_MONITORING].sort((a, b) => new Date(a.dataISO).getTime() - new Date(b.dataISO).getTime())
     }, [])
     return (
         <div className="min-h-svh bg-muted/30 px-4 py-6 md:px-8 md:py-8">
