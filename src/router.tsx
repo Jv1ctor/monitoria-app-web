@@ -5,6 +5,9 @@ import { PublicLayout } from "./components/layout/public-layout"
 import { LoginPage } from "./pages/auth/Login"
 import { RegisterPage } from "./pages/auth/Register"
 import { RecoverPasswordPage } from "./pages/auth/RecoverPassword"
+import { ForumListPage } from "./pages/forum/ForumList"
+import { ForumCreatePage } from "./pages/forum/ForumCreate"
+import { ForumTopicPage } from "./pages/forum/ForumTopic"
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +27,18 @@ export const router = createBrowserRouter([
   {
     path: "/recover",
     element: <RecoverPasswordPage/>,
+  },
+  {
+    path: "/forum",
+    element: <ForumListPage />,
+  },
+  {
+    path: "/forum/new",
+    element: <ForumCreatePage />,
+  },
+  {
+    path: "/forum/:id",
+    element: <ForumTopicPage />,
   },
   {
     path: "/ds",
