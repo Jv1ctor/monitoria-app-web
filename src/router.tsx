@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router"
 import { DesignSystem } from "./pages/DesignSystem"
-import { Example } from "./pages/Example"
 import { PublicLayout } from "./components/layout/public-layout"
+import { PublicPage } from "./pages/PublicPage/PublicPage"
 import Dashboard from "./pages/student/Dashboard"
 import { DashboardLayout } from "./components/layout/dashboard-layout"
 import { LoginPage } from "./pages/auth/Login"
@@ -12,7 +12,7 @@ export const router = createBrowserRouter([
   {
     path: "/",
     element: <PublicLayout />,
-    children: [{ index: true, element: <Example /> }],
+    children: [{ index: true, element: <PublicPage /> }],
     loader: () => console.log("Executa sempre quando carrega uma page"),
   },
   {

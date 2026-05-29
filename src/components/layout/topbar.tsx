@@ -14,7 +14,7 @@ function Topbar({ navComponents = [], className, actions }: Props) {
   return (
     <div
       className={cn(
-        "flex gap-3 px-10 py-4 justify-between sm:flex-row sm:items-center",
+        "flex gap-3 px-10 py-4 justify-between border-b border-gray-200 sm:flex-row sm:items-center",
         className,
       )}
     >

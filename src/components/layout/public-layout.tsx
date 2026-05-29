@@ -14,9 +14,9 @@ import { Outlet } from "react-router"
 
 function PublicLayout() {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col ">
       <Topbar
-        className="mx-0 md:mx-25"
+        className="mx-0 md:px-25"
         actions={
           <div className="flex flex-row items-center lg:gap-4">
             <div className="hidden lg:flex items-center gap-4">
@@ -56,7 +56,7 @@ function PublicLayout() {
         }
       />
 
-      <main>
+      <main className="flex flex-col items-center jusitfy-center">
         <Outlet />
       </main>
 
