@@ -53,7 +53,7 @@ function DashboardLayout() {
                         </NavLink>
                       </SheetClose>
                       <SheetClose asChild>
-                        <NavLink to={"/ds"}>
+                        <NavLink to={"/student/subject"}>
                           <Button variant="ghost">Minhas Monitorias</Button>
                         </NavLink>
                       </SheetClose>
@@ -124,7 +124,7 @@ function DashboardLayout() {
                 }`,
               )
             }
-            to={"/ds"}
+            to={"/student/subject"} //alterando para a rota student/subject
             key="minhas_monitorias"
           >
             Minhas Monitorias
