@@ -7,6 +7,7 @@ import { DashboardLayout } from "./components/layout/dashboard-layout"
 import { LoginPage } from "./pages/auth/Login"
 import { RegisterPage } from "./pages/auth/Register"
 import { RecoverPasswordPage } from "./pages/auth/RecoverPassword"
+import RatingTeachingAssistant from "./pages/student/RatingTeachingAssistant"
 
 export const router = createBrowserRouter([
   {
@@ -35,5 +36,10 @@ export const router = createBrowserRouter([
     path: "/student",
     element: <DashboardLayout />,
     children: [{ path: "dashboard", index: true, element: <Dashboard /> }],
-  }
+  },
+  {
+    path: "/student",
+    element: <DashboardLayout />,
+    children: [{ path: "subject", index: true, element: <RatingTeachingAssistant /> }],
+  },
 ])
