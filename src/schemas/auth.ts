@@ -41,8 +41,3 @@ export const recoverPasswordSchema = z.object({
     }),
 })
 
-export const createTopicSchema = z.object({
-  course: z.string().min(1, "Selecione uma disciplina"),
-  title: z.string().min(1, "O título do tópico é obrigatório"),
-  content: z.string().min(1, "A mensagem do tópico é obrigatória"),
-})
