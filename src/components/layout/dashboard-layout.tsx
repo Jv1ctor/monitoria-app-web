@@ -48,12 +48,12 @@ function DashboardLayout() {
                   <SheetHeader>
                     <div className="flex flex-col justify-center gap-5">
                       <SheetClose asChild>
-                        <NavLink to={"/ds"}>
+                        <NavLink to={"/student/dashboard"}> 
                           <Button variant="ghost">Inicio</Button>
                         </NavLink>
                       </SheetClose>
                       <SheetClose asChild>
-                        <NavLink to={"/ds"}>
+                        <NavLink to={"/student/subject"}>
                           <Button variant="ghost">Minhas Monitorias</Button>
                         </NavLink>
                       </SheetClose>
@@ -109,7 +109,7 @@ function DashboardLayout() {
                 }`,
               )
             }
-            to={"/"}
+            to={"/student/dashboard"} //alterando para a rota student/dashboard
             key="inicio"
           >
             Inicio
@@ -124,7 +124,7 @@ function DashboardLayout() {
                 }`,
               )
             }
-            to={"/ds"}
+            to={"/student/subject"} //alterando para a rota student/subject
             key="minhas_monitorias"
           >
             Minhas Monitorias
