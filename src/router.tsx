@@ -7,6 +7,8 @@ import { DashboardLayout } from "./components/layout/dashboard-layout"
 import { LoginPage } from "./pages/auth/Login"
 import { RegisterPage } from "./pages/auth/Register"
 import { RecoverPasswordPage } from "./pages/auth/RecoverPassword"
+import { ForumListPage } from "./pages/forum/ForumList"
+import { ForumTopicPage } from "./pages/forum/ForumTopic"
 import RatingTeachingAssistant from "./pages/student/RatingTeachingAssistant"
 
 export const router = createBrowserRouter([
@@ -27,6 +29,14 @@ export const router = createBrowserRouter([
   {
     path: "/recover",
     element: <RecoverPasswordPage/>,
+  },
+  {
+    path: "/forum",
+    element: <ForumListPage />,
+  },
+  {
+    path: "/forum/:id",
+    element: <ForumTopicPage />,
   },
   {
     path: "/ds",
