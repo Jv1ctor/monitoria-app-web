@@ -10,6 +10,7 @@ import { RecoverPasswordPage } from "./pages/auth/RecoverPassword"
 import { ForumListPage } from "./pages/forum/ForumList"
 import { ForumTopicPage } from "./pages/forum/ForumTopic"
 import RatingTeachingAssistant from "./pages/student/RatingTeachingAssistant"
+import { MonitorSchedulePage } from "@/pages/schedule/MonitorSchedule"
 import { MaterialsListPage } from "./pages/materials/materialsList"
 
 export const router = createBrowserRouter([
@@ -54,6 +55,10 @@ export const router = createBrowserRouter([
     children: [{ path: "subject", index: true, element: <RatingTeachingAssistant /> }],
   },
   {
+    path: "/monitorSchedule",
+    element: <MonitorSchedulePage />
+  }
+
     path: "/materials",
     element: <MaterialsListPage />,
   },
