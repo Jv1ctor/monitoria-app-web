@@ -12,6 +12,7 @@ import { ForumTopicPage } from "./pages/forum/ForumTopic"
 import RatingTeachingAssistant from "./pages/student/RatingTeachingAssistant"
 import { MonitorSchedulePage } from "@/pages/schedule/MonitorSchedule"
 import { MaterialsListPage } from "./pages/materials/materialsList"
+import { AvailableMonitoringsPage } from "@/pages/student/AvailableMonitorings"
 
 export const router = createBrowserRouter([
   {
@@ -62,4 +63,9 @@ export const router = createBrowserRouter([
     path: "/materials",
     element: <MaterialsListPage />,
   },
+  {
+    path: "availableMonitorings",
+    element: <AvailableMonitoringsPage />,
+  },
+  
 ])
