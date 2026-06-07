@@ -47,8 +47,8 @@ export function AvailableMonitoringsPage() {
     }
   }
 
-  const handleCardClick = (id: string) => {
-    navigate("/specificMonitoring") //é pra ir pra pag especifica 
+  const handleCardClick = (title: string) => {
+    navigate("/specificMonitoring", { state: { subjectTitle: title } })
   }
 
   return (
@@ -61,7 +61,7 @@ export function AvailableMonitoringsPage() {
         {currentMonitorings.map((item) => (
           <Card 
             key={item.id} 
-            onClick={() => handleCardClick(item.id)}
+            onClick={() => handleCardClick(item.title)}
             className="shadow-sm border-border hover:border-[#0047BA]/40 hover:shadow-md transition-all cursor-pointer group flex flex-col h-full"
           >
             <CardContent className="p-5 flex flex-col h-full">
