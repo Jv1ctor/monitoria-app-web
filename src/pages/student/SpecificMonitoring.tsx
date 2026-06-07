@@ -105,7 +105,7 @@ function MonitorCard({ data, isEnrolled = false, onAction, onUnenroll }: Monitor
                 className="w-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 text-xs h-8"
                 onClick={() => onUnenroll?.(data.id)}
               >
-                Desinscrever-se
+                Cancelar Inscrição
               </Button>
             </>
           ) : (
