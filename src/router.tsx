@@ -12,9 +12,6 @@ import { adminLoader } from "./loader/admin.loader"
 import { studentRoutes } from "./pages/student/routes"
 import { monitorRoutes } from "./pages/monitor/routes"
 import { adminRoutes } from "./pages/admin/routes"
-import NextSessions from "./pages/teachingAssistant/NextSessions"
-import { MonitorSchedulePage } from "@/pages/schedule/MonitorSchedule"
-import { AvailableMonitoringsPage } from "@/pages/student/AvailableMonitorings"
 
 export const router = createBrowserRouter([
   {
@@ -67,5 +64,9 @@ export const router = createBrowserRouter([
   // {
   //   path: "availableMonitorings",
   //   element: <AvailableMonitoringsPage />,
+  // },
+  // {
+  //   path: "/specificMonitoring",
+  //   element: <SpecificMonitoringPage />,
   // },
 ])
