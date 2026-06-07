@@ -8,6 +8,12 @@ import { LoginPage } from "./pages/auth/Login"
 import { RegisterPage } from "./pages/auth/Register"
 import { RecoverPasswordPage } from "./pages/auth/RecoverPassword"
 import DashboardTeaching from "./pages/teachingAssistant/DashboardTeaching"
+import { ForumListPage } from "./pages/forum/ForumList"
+import { ForumTopicPage } from "./pages/forum/ForumTopic"
+import RatingTeachingAssistant from "./pages/student/RatingTeachingAssistant"
+import { MonitorSchedulePage } from "@/pages/schedule/MonitorSchedule"
+import { MaterialsListPage } from "./pages/materials/materialsList"
+import { AvailableMonitoringsPage } from "@/pages/student/AvailableMonitorings"
 
 export const router = createBrowserRouter([
   {
@@ -29,6 +35,14 @@ export const router = createBrowserRouter([
     element: <RecoverPasswordPage/>,
   },
   {
+    path: "/forum",
+    element: <ForumListPage />,
+  },
+  {
+    path: "/forum/:id",
+    element: <ForumTopicPage />,
+  },
+  {
     path: "/ds",
     element: <DesignSystem />,
   },
@@ -41,5 +55,21 @@ export const router = createBrowserRouter([
     path: "/teaching",
     element: <DashboardLayout />,
     children: [{ path: "dashboard", index: true, element: <DashboardTeaching /> }],
+    path: "/student",
+    element: <DashboardLayout />,
+    children: [{ path: "subject", index: true, element: <RatingTeachingAssistant /> }],
+  },
+  {
+    path: "/monitorSchedule",
+    element: <MonitorSchedulePage />
   }
+
+    path: "/materials",
+    element: <MaterialsListPage />,
+  },
+  {
+    path: "availableMonitorings",
+    element: <AvailableMonitoringsPage />,
+  },
+  
 ])

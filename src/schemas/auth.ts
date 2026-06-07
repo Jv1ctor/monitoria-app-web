@@ -40,3 +40,4 @@ export const recoverPasswordSchema = z.object({
       message: "Utilize seu e-mail da Unifor (@edu.unifor.br)",
     }),
 })
+
