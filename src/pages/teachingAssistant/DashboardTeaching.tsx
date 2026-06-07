@@ -13,9 +13,9 @@ const METRICS: Metric[] = [
 ]
 
 const SESSIONS: Session[] = [
-  { id: 1, dataISO: "2026-05-31T14:00:00-03:00", disciplina: "Cálculo I", local: "Sala C-201" },
-  { id: 2, dataISO: "2026-06-02T14:00:00-03:00", disciplina: "Cálculo I", local: "Sala C-201" },
-  { id: 3, dataISO: "2026-06-05T14:00:00-03:00", disciplina: "Cálculo I", local: "Online - Google Meet" },
+    { id: 1, dataISO: "2026-05-31T14:00:00-03:00", disciplina: "Cálculo I", local: "Sala C-201" },
+    { id: 2, dataISO: "2026-06-07T14:00:00-03:00", disciplina: "Cálculo I", local: "Sala C-201" },
+    { id: 3, dataISO: "2026-06-05T14:00:00-03:00", disciplina: "Cálculo I", local: "Online - Google Meet" },
 ]
 
 function DashboardTeaching() {
@@ -67,8 +67,17 @@ function DashboardTeaching() {
                                             </div>
                                         </div>
 
-                                        <Button variant={isHoje ? "default" : "outline"} size="sm">
-                                            Registrar Frequência
+                                        <Button
+                                            variant={isHoje ? "default" : "outline"}
+                                            size="sm"
+                                            disabled={!isHoje}
+                                            className={
+                                                isHoje
+                                                    ? "hover:brightness-95"
+                                                    : "cursor-not-allowed border-border text-muted-foreground hover:bg-transparent hover:text-muted-foreground disabled:opacity-100"
+                                            }
+                                        >
+                                            Registrar Frequencia
                                         </Button>
                                     </div>
                                 </article>
