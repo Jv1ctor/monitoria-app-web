@@ -1,5 +1,5 @@
 import * as React from "react"
-import { FileText, Plus, Pencil, Trash2, Sheet } from "lucide-react"
+import { FileText, Plus, Pencil, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -8,8 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 const initialMaterials = [
   { id: "1", title: "Apostila de Limites", course: "Cálculo I", type: "PDF", date: "12/05/2026" },
@@ -137,10 +136,10 @@ export function MaterialsListPage() {
     setIsEditOpen(false)
   }
 
-  // const onOpenCreateChange = (open: boolean) => {
-  //   setIsCreateOpen(open)
-  //   if (!open) setFormErrors({})
-  // }
+  const onOpenCreateChange = (open: boolean) => {
+    setIsCreateOpen(open)
+    if (!open) setFormErrors({})
+  }
 
   const onOpenEditChange = (open: boolean) => {
     setIsEditOpen(open)
@@ -155,18 +154,18 @@ export function MaterialsListPage() {
           <p className="text-sm text-muted-foreground mt-1">Publique apostilas, listas e slides.</p>
         </div>
 
-        {/* <Sheet ={isCreateOpen} onOpenChange={onOpenCreateChange}>
-          <SheetTrigger asChild>
+        <Dialog open={isCreateOpen} onOpenChange={onOpenCreateChange}>
+          <DialogTrigger asChild>
             <Button className="bg-[#0047BA] hover:bg-[#003a99] text-white">
               <Plus className="mr-2 size-4" />
               Publicar Material
             </Button>
-          </SheetTrigger>
-          <SheetContent className="sm:max-w-md">
-            <SheetHeader className="mb-2">
-              <SheetTitle>Publicar Material</SheetTitle>
-              <SheetDescription>Preencha os dados e selecione o arquivo (.pdf, .docx, .pptx).</SheetDescription>
-            </SheetHeader>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader className="mb-2">
+              <DialogTitle>Publicar Material</DialogTitle>
+              <DialogDescription>Preencha os dados e selecione o arquivo (.pdf, .docx, .pptx).</DialogDescription>
+            </DialogHeader>
             <form onSubmit={handleCreateSubmit}>
               <FieldGroup className="gap-5">
                 <Field>
@@ -210,8 +209,8 @@ export function MaterialsListPage() {
                 </div>
               </FieldGroup>
             </form>
-          </SheetContent>
-        </Sheet> */}
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Card className="shadow-sm border-border overflow-hidden">
