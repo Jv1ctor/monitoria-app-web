@@ -71,7 +71,7 @@ export default function RatingTeachingAssistant() {
     }
 
     return (
-        <div className="min-h-svh bg-muted/30 px-4 py-6 md:px-8 md:py-8">
+        <div className="px-4 py-6 md:px-8 md:py-8">
             <div className="mx-auto w-full max-w-5xl space-y-4">
                 <Link
                     to="/student/dashboard"

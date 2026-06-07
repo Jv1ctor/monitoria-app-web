@@ -7,6 +7,8 @@ import { EmptyState } from "@/components/shared/empty-state"
 import { Badge } from "@/components/ui/badge"
 import type { Monitoring } from "@/types/student/Monitoring.type"
 import { formatData, formatHora, hoje } from "@/lib/data-format.lib"
+import { SectionHeading } from "@/components/shared/SectionHeading"
+import { NavLink } from "react-router"
 
 
 
@@ -43,9 +45,9 @@ const Dashboard = () => {
         return [...MOCK_MONITORING].sort((a, b) => new Date(a.dataISO).getTime() - new Date(b.dataISO).getTime())
     }, [])
     return (
-        <div className="min-h-svh bg-muted/30 px-4 py-6 md:px-8 md:py-8">
+        <div className="">
             <div className="mx-auto w-full max-w-5xl space-y-4">
-                <h1>Proximas Monitorias</h1>
+                <SectionHeading title="Próximas Monitorias" meta={`${monitoriasOrdenadas.length} agendadas`} />
 
                 {monitoriasOrdenadas.length === 0 ? (
                     <EmptyState
@@ -59,7 +61,7 @@ const Dashboard = () => {
                                 key={item.id}
                                 className="rounded-lg border border-border bg-card shadow-card"
                             >
-                                <div className={`flex flex-col gap-3 rounded-l-lg border-l-4 ${hoje(item.dataISO) ? "border-l-4 border-l-[var(--primary-500)] " : "border-l-4 border-l-primary"} p-4 md:flex-row md:items-center md:justify-between`}>
+                                <div className={`flex flex-col gap-3 rounded-l-lg border-l-4 ${hoje(item.dataISO) ? "border-l-4 border-l-primary/50 " : "border-l-4 border-l-primary"} p-4 md:flex-row md:items-center md:justify-between`}>
                                     <div className="flex items-center gap-3">
                                         <Avatar size="default">
                                             <AvatarFallback className="bg-primary text-white">
@@ -88,7 +90,9 @@ const Dashboard = () => {
                                         </div>
 
                                         <Button variant="outline" size="sm">
-                                            Ver detalhes
+                                            <NavLink to='/student'>
+                                                Ver detalhes
+                                            </NavLink>
                                         </Button>
                                     </div>
                                 </div>
