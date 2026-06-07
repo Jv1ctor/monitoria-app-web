@@ -12,6 +12,8 @@ import { adminLoader } from "./loader/admin.loader"
 import { studentRoutes } from "./pages/student/routes"
 import { monitorRoutes } from "./pages/monitor/routes"
 import { adminRoutes } from "./pages/admin/routes"
+import { MonitorSchedulePage } from "@/pages/schedule/MonitorSchedule"
+import { AvailableMonitoringsPage } from "@/pages/student/AvailableMonitorings"
 
 export const router = createBrowserRouter([
   {
@@ -57,4 +59,14 @@ export const router = createBrowserRouter([
     path: "/ds",
     element: <DesignSystem />,
   },
+  {
+    path: "/monitorSchedule",
+    element: <MonitorSchedulePage />
+  },
+
+  {
+    path: "availableMonitorings",
+    element: <AvailableMonitoringsPage />,
+  },
+  
 ])
