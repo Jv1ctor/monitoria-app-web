@@ -7,6 +7,7 @@ import { DashboardLayout } from "./components/layout/dashboard-layout"
 import { LoginPage } from "./pages/auth/Login"
 import { RegisterPage } from "./pages/auth/Register"
 import { RecoverPasswordPage } from "./pages/auth/RecoverPassword"
+import DashboardTeaching from "./pages/teachingAssistant/DashboardTeaching"
 import { ForumListPage } from "./pages/forum/ForumList"
 import { ForumTopicPage } from "./pages/forum/ForumTopic"
 import RatingTeachingAssistant from "./pages/student/RatingTeachingAssistant"
@@ -51,6 +52,9 @@ export const router = createBrowserRouter([
     children: [{ path: "dashboard", index: true, element: <Dashboard /> }],
   },
   {
+    path: "/teaching",
+    element: <DashboardLayout />,
+    children: [{ path: "dashboard", index: true, element: <DashboardTeaching /> }],
     path: "/student",
     element: <DashboardLayout />,
     children: [{ path: "subject", index: true, element: <RatingTeachingAssistant /> }],
