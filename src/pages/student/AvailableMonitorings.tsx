@@ -33,7 +33,6 @@ const ITEMS_PER_PAGE = 12
 
 export function AvailableMonitoringsPage() {
   const navigate = useNavigate()
-  
   const [monitorings] = React.useState(mockMonitorings)
   const [currentPage, setCurrentPage] = React.useState(1)
 
@@ -48,7 +47,7 @@ export function AvailableMonitoringsPage() {
   }
 
   const handleCardClick = (id: string) => {
-    navigate("") //é pra ir pra pag especifica 
+    navigate("/specificMonitoring") 
   }
 
   return (
