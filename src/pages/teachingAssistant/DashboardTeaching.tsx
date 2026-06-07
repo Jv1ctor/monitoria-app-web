@@ -18,7 +18,7 @@ const SESSIONS: Session[] = [
     { id: 3, dataISO: "2026-06-05T14:00:00-03:00", disciplina: "Cálculo I", local: "Online - Google Meet" },
 ]
 
-function DashboardTeaching() {
+function NextSessions() {
     return (
         <div className="min-h-svh bg-muted/30 px-4 py-6 md:px-8 md:py-8">
             <div className="mx-auto w-full max-w-5xl space-y-5">
@@ -90,4 +90,4 @@ function DashboardTeaching() {
     )
 }
 
-export default DashboardTeaching
+export default NextSessions

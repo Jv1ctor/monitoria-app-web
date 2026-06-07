@@ -12,7 +12,7 @@ import { adminLoader } from "./loader/admin.loader"
 import { studentRoutes } from "./pages/student/routes"
 import { monitorRoutes } from "./pages/monitor/routes"
 import { adminRoutes } from "./pages/admin/routes"
-import DashboardTeaching from "./pages/teachingAssistant/DashboardTeaching"
+import NextSessions from "./pages/teachingAssistant/NextSessions"
 import { MonitorSchedulePage } from "@/pages/schedule/MonitorSchedule"
 import { AvailableMonitoringsPage } from "@/pages/student/AvailableMonitorings"
 
@@ -60,22 +60,12 @@ export const router = createBrowserRouter([
     path: "/ds",
     element: <DesignSystem />,
   },
-  {
-    path: "/teaching",
-    element: <DashboardLayout />,
-    children: [{ path: "dashboard", index: true, element: <DashboardTeaching /> }],
-  },
-  {
-    path: "/student",
-    element: <DashboardLayout />,
-    children: [{ path: "subject", index: true, element: <RatingTeachingAssistant /> }],
-  },
-  {
-    path: "/monitorSchedule",
-    element: <MonitorSchedulePage />
-  },
-  {
-    path: "availableMonitorings",
-    element: <AvailableMonitoringsPage />,
-  },
+  // {
+  //   path: "/monitorSchedule",
+  //   element: <MonitorSchedulePage />
+  // },
+  // {
+  //   path: "availableMonitorings",
+  //   element: <AvailableMonitoringsPage />,
+  // },
 ])

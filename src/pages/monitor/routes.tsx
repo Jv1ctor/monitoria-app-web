@@ -3,6 +3,7 @@ import { ForumListPage } from "../forum/ForumList";
 import { ForumTopicPage } from "../forum/ForumTopic";
 import { monitorLoader } from "@/loader/monitor.loader";
 import { MaterialsListPage } from "./pages/materials/materialsList";
+import NextSessions from "../../pages/teachingAssistant/DashboardTeaching";
 
 export const monitorRoutes = [
   { index: true, handle: { title: "Inicio" }, element: <WelcomeMonitor /> },
@@ -10,6 +11,10 @@ export const monitorRoutes = [
     path: "materials",
     loader: monitorLoader,
     element: <MaterialsListPage />,
+  },
+  {
+    path: "teaching",
+    element: <NextSessions />,
   },
   {
     path: "forum",
