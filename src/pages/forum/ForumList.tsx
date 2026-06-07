@@ -1,6 +1,6 @@
 import * as React from "react"
-import { useNavigate } from "react-router"
-import { MessageSquare, Trash2, Plus } from "lucide-react"
+import { useLoaderData, useNavigate } from "react-router"
+import { MessageSquare, Trash2, Plus, InfoIcon } from "lucide-react"
 import { toast } from "sonner" 
 
 import { Button } from "@/components/ui/button"
@@ -17,6 +17,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { createTopicSchema } from "@/schemas/forum"
+import type { User } from "@/types/User"
+import type { Topic } from "@/types/forum/Topic.type"
+import { initialTopics } from "./forum.mock"
 
 const COURSES = [
   { value: "calculo1", label: "Cálculo I" },
@@ -24,31 +27,11 @@ const COURSES = [
   { value: "discreta", label: "Matemática Discreta" },
 ]
 
-export const initialTopics = [
-  {
-    id: "1",
-    title: "Grafos e Árvores",
-    tag: "Matemática Discreta",
-    preview: "Introdução aos conceitos de vértices, arestas, árvores binárias e aplicações em problemas computacionais.",
-    author: "Gabriel Santos",
-    date: "10/05/2026",
-    repliesCount: 3,
-  },
-  {
-    id: "2",
-    title: "Pilhas, Filas e Listas Encadeadas",
-    tag: "Estrutura de Dados",
-    preview: "Explicação prática sobre funcionamento, implementação e aplicações das principais estruturas lineares.",
-    author: "Camila Rocha",
-    date: "08/05/2026",
-    repliesCount: 5,
-  }
-]
-
 export function ForumListPage() {
   const navigate = useNavigate()
-  const [currentUserRole] = React.useState<"STUDENT" | "MONITOR">("STUDENT") 
-  const [topics, setTopics] = React.useState(initialTopics)
+  const { id } = useLoaderData() as User
+  const role = id.role.role
+  const [topics, setTopics] = React.useState<Topic[]>(initialTopics)
   
   const [isSheetOpen, setIsSheetOpen] = React.useState(false)
   const [selectedCourse, setSelectedCourse] = React.useState("")
@@ -63,7 +46,7 @@ export function ForumListPage() {
   }
 
   const handleCardClick = (topicId: string) => {
-    navigate(`/forum/${topicId}`)
+    navigate(`/${role}/forum/${topicId}`)
   }
 
   const handleCreateSubmit = (e: React.FormEvent) => {
@@ -85,12 +68,12 @@ export function ForumListPage() {
       return
     }
 
-    const newTopic = {
+    const newTopic: Topic = {
       id: Math.random().toString(),
       title: data.title,
       tag: COURSES.find(c => c.value === data.course)?.label || data.course,
       preview: data.content,
-      author: "Você (Monitor)",
+      author: { firstName: id.firstName, lastName: id.lastName },
       date: "Agora",
       repliesCount: 0
     }
@@ -112,7 +95,7 @@ export function ForumListPage() {
           <p className="text-sm text-muted-foreground mt-1">Tire dúvidas e converse com a turma.</p>
         </div>
         
-        {currentUserRole === "MONITOR" && (
+        {role === "monitor" && (
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
               <Button>
@@ -129,36 +112,7 @@ export function ForumListPage() {
                 </SheetDescription>
               </SheetHeader>
 
-              <form onSubmit={handleCreateSubmit}>
-                <FieldGroup className="gap-6">
-                  <Field>
-                    <FieldLabel>Disciplina</FieldLabel>
-                    <Select onValueChange={setSelectedCourse} value={selectedCourse}>
-                      <SelectTrigger className={formErrors.course ? "border-destructive" : ""}>
-                        <SelectValue placeholder="Selecione..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {COURSES.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                    {formErrors.course && <FieldError errors={[{ message: formErrors.course }]} />}
-                  </Field>
-                  <Field>
-                    <FieldLabel>Título</FieldLabel>
-                    <Input ref={titleRef} className={formErrors.title ? "border-destructive" : ""} />
-                    {formErrors.title && <FieldError errors={[{ message: formErrors.title }]} />}
-                  </Field>
-                  <Field>
-                    <FieldLabel>Mensagem</FieldLabel>
-                    <textarea ref={contentRef} className={`flex w-full min-h-[160px] rounded-md border bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 resize-y ${formErrors.content ? "border-destructive focus-visible:ring-destructive" : "border-input focus-visible:ring-ring"}`} />
-                    {formErrors.content && <FieldError errors={[{ message: formErrors.content }]} />}
-                  </Field>
-                  <div className="flex justify-end gap-3 mt-4">
-                    <Button type="button" variant="secondary" onClick={() => setIsSheetOpen(false)}>Cancelar</Button>
-                    <Button type="submit">Publicar</Button>
-                  </div>
-                </FieldGroup>
-              </form>
+              {/* <FormModal/> */}
             </SheetContent>
           </Sheet>
         )}
@@ -166,7 +120,9 @@ export function ForumListPage() {
 
       <div className="flex flex-col gap-4">
         {topics.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">Nenhum tópico encontrado.</div>
+          <div className="text-center py-5 flex flex-row gap-3 items-center justify-center ">
+            <InfoIcon/> <p>Nenhum tópico criado até o momento.</p>
+          </div>
         ) : (
           topics.map((topic) => (
             <Card 
@@ -186,10 +142,10 @@ export function ForumListPage() {
                     <span className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded uppercase">{topic.tag}</span>
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-1 mb-2">{topic.preview}</p>
-                  <div className="text-xs text-muted-foreground/80 font-medium">Por {topic.author} · {topic.date} · {topic.repliesCount} respostas</div>
+                  <div className="text-xs text-muted-foreground/80 font-medium">Por {topic.author.firstName} {topic.author.lastName} · {topic.date} · {topic.repliesCount} respostas</div>
                 </div>
-                {currentUserRole === "MONITOR" && (
-                  <button 
+                {role === "monitor" && (
+                  <button
                     onClick={(e) => handleDelete(e, topic.id)} 
                     className="text-muted-foreground hover:text-destructive transition-colors p-2 z-10" 
                     title="Excluir"

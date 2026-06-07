@@ -1,57 +1,35 @@
 import * as React from "react"
-import { NavLink, useParams } from "react-router" 
+import { NavLink, useLoaderData, useParams } from "react-router"
 import { ChevronLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { initialTopics } from "./ForumList"
-
-const allReplies = [
-  {
-    id: "1",
-    topicId: "1",
-    authorInitials: "RS",
-    authorName: "Rita Souza",
-    role: "STUDENT",
-    date: "10/05/2026 - 09:14",
-    content: "Qual a diferença entre um grafo e uma árvore?",
-  },
-  {
-    id: "2",
-    topicId: "1",
-    authorInitials: "JL",
-    authorName: "João Luiz",
-    role: "MONITOR",
-    date: "10/05/2026 - 10:02",
-    content: "Oi, Rita! A árvore é um tipo especial de grafo que não possui ciclos e possui uma organização hierárquica.",
-  }
-]
+import { getInitials } from "@/lib/getInitials"
+import type { User } from "@/types/User"
+import type { Reply } from "@/types/forum/Reply.type"
+import { initialReplies, initialTopics } from "./forum.mock"
 
 export function ForumTopicPage() {
-  const { id } = useParams() 
-  
-  const topic = initialTopics.find((t) => t.id === id)
+  const { id: topicId } = useParams()
+  const { id: user } = useLoaderData() as User
+  const role = user.role.role
 
-  const [currentUserRole] = React.useState<"STUDENT" | "MONITOR">("STUDENT")
-  
-  const [replies, setReplies] = React.useState(() => 
-    allReplies.filter((reply) => reply.topicId === id)
+  const topic = initialTopics.find((t) => t.id === topicId)
+
+  const [replies, setReplies] = React.useState<Reply[]>(() =>
+    initialReplies.filter((reply) => reply.topicId === topicId)
   )
-  
+
   const replyContentRef = React.useRef<HTMLTextAreaElement>(null)
 
   if (!topic) {
     return (
       <div className="max-w-4xl mx-auto py-12 px-6 w-full text-center">
         <h1 className="text-2xl font-bold text-foreground mb-4">Tópico não encontrado</h1>
-        <NavLink to="/forum">
+        <NavLink to={`/${role}/forum`}>
           <Button variant="outline">Voltar ao fórum</Button>
         </NavLink>
       </div>
     )
-  }
-
-  const getInitials = (name: string) => {
-    return name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase()
   }
 
   const handleSubmitReply = (e: React.FormEvent) => {
@@ -60,20 +38,11 @@ export function ForumTopicPage() {
 
     if (!content || content.trim() === "") return
 
-    let authorName = "Você (Monitor)"
-    let authorInitials = "MO"
-
-    if (currentUserRole === "STUDENT") {
-      authorName = "Você (Aluno)"
-      authorInitials = "AL"
-    }
-
-    const newReply = {
+    const newReply: Reply = {
       id: Math.random().toString(),
-      topicId: id || "",
-      authorInitials: authorInitials,
-      authorName: authorName,
-      role: currentUserRole,
+      topicId: topicId || "",
+      author: { firstName: user.firstName, lastName: user.lastName },
+      role: role,
       date: "Agora mesmo",
       content: content,
     }
@@ -87,7 +56,7 @@ export function ForumTopicPage() {
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-6 w-full">
-      <NavLink to="/forum" className="inline-flex items-center text-sm font-semibold text-muted-foreground hover:text-foreground mb-6 transition-colors">
+      <NavLink to={`/${role}/forum`} className="inline-flex items-center text-sm font-semibold text-muted-foreground hover:text-foreground mb-6 transition-colors">
         <ChevronLeft className="mr-1 size-4" />
         Voltar ao fórum
       </NavLink>
@@ -113,7 +82,7 @@ export function ForumTopicPage() {
               {getInitials(topic.author)}
             </div>
             <div>
-              <p className="text-sm font-bold text-foreground leading-tight">{topic.author}</p>
+              <p className="text-sm font-bold text-foreground leading-tight">{topic.author.firstName} {topic.author.lastName}</p>
               <p className="text-xs text-muted-foreground">Autor do Tópico</p>
             </div>
           </div>
@@ -126,7 +95,7 @@ export function ForumTopicPage() {
 
       <div className="mb-8">
         <h2 className="text-lg font-bold text-foreground mb-4">Respostas</h2>
-        
+
         <div className="flex flex-col gap-4">
           {replies.length === 0 ? (
             <p className="text-sm text-muted-foreground py-4 text-center border border-dashed rounded-lg">
@@ -138,18 +107,18 @@ export function ForumTopicPage() {
                 <CardContent className="p-5">
                   <div className="flex items-center gap-3 mb-3">
                     <div className={`size-8 rounded-full flex items-center justify-center font-bold text-xs ${
-                      reply.role === "MONITOR" ? "bg-[#00A8E8] text-white" : "bg-primary text-primary-foreground"
+                      reply.role === "monitor" ? "bg-info text-white" : "bg-primary text-primary-foreground"
                     }`}>
-                      {reply.authorInitials}
+                      {getInitials(reply.author)}
                     </div>
-                    
+
                     <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-foreground">{reply.authorName}</span>
+                        <span className="text-sm font-bold text-foreground">{reply.author.firstName} {reply.author.lastName}</span>
                         <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase ${
-                          reply.role === "MONITOR" ? "bg-[#00A8E8]/10 text-[#00A8E8]" : "bg-muted text-muted-foreground"
+                          reply.role === "monitor" ? "bg-info/10 text-info" : "bg-muted text-muted-foreground"
                         }`}>
-                          {reply.role === "MONITOR" ? "Monitor" : "Aluno"}
+                          {reply.role === "monitor" ? "Monitor" : "Aluno"}
                         </span>
                       </div>
                       <span className="text-xs text-muted-foreground hidden sm:inline">·</span>
