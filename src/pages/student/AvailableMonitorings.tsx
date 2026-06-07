@@ -48,7 +48,7 @@ export function AvailableMonitoringsPage() {
   }
 
   const handleCardClick = (id: string) => {
-    navigate("") //é pra ir pra pag especifica 
+    navigate("/specificMonitoring") //é pra ir pra pag especifica 
   }
 
   return (
