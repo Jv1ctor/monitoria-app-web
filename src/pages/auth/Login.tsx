@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field"
 import { loginSchema } from "@/schemas/auth"
+import { paths } from "@/routes/paths"
 
 export const LoginPage = () => {
   const navigate = useNavigate()
@@ -46,13 +47,13 @@ export const LoginPage = () => {
 
     if (enrollment === "2222222" && password === "aluno123") {
       toast.success("Login efetuado com sucesso!")
-      navigate("/") 
+      navigate(paths.home)
     } else if (enrollment === "1111111" && password === "monitor123") {
       toast.success("Bem-vindo, Monitor!")
-      navigate("/") 
+      navigate(paths.home)
     } else if (enrollment === "0000000" && password === "admin123") {
       toast.success("Bem vindo, Coordenador!")
-      navigate("/")
+      navigate(paths.home)
     } else {
       toast.error("Matrícula ou senha inválida. Tente novamente.")
     }
@@ -112,7 +113,7 @@ export const LoginPage = () => {
                     Lembrar-me
                   </label>
                 </div>
-                <NavLink to="/recover" className="text-xs font-semibold text-primary hover:underline">
+                <NavLink to={paths.recover} className="text-xs font-semibold text-primary hover:underline">
                   Esqueci minha senha
                 </NavLink>
               </div>
@@ -138,7 +139,7 @@ export const LoginPage = () => {
               <div className="text-center space-y-2">
                 <p className="text-xs text-muted-foreground font-medium">
                   Primeiro acesso?{" "}
-                  <NavLink to="/register" className="font-bold text-primary hover:underline">
+                  <NavLink to={paths.register} className="font-bold text-primary hover:underline">
                     Cadastre-se aqui
                   </NavLink>
                 </p>

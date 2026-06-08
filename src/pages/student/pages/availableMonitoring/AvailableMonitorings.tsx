@@ -4,6 +4,7 @@ import { useNavigate } from "react-router"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { paths } from "@/routes/paths"
 
 const mockMonitorings = [
   { id: "1", title: "Desenvolvimento Web Front-End", course: "Ciência da Computação", code: "COMP011", monitorsCount: 3 },
@@ -48,7 +49,7 @@ export function AvailableMonitoringsPage() {
   }
 
   const handleCardClick = (title: string) => {
-    navigate("/specificMonitoring", { state: { subjectTitle: title } })
+    navigate(paths.studentMonitorings, { state: { subjectTitle: title } })
   }
 
   return (

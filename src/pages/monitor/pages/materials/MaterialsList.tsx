@@ -3,7 +3,6 @@ import { FileText, Plus, Pencil, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -213,58 +212,54 @@ export function MaterialsListPage() {
         </Dialog>
       </div>
 
-      <Card className="shadow-sm border-border overflow-hidden">
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader className="bg-muted/30">
-              <TableRow>
-                <TableHead className="w-[300px] text-xs font-bold text-muted-foreground uppercase">Título</TableHead>
-                <TableHead className="text-xs font-bold text-muted-foreground uppercase">Disciplina</TableHead>
-                <TableHead className="text-xs font-bold text-muted-foreground uppercase">Tipo</TableHead>
-                <TableHead className="text-xs font-bold text-muted-foreground uppercase">Publicado</TableHead>
-                <TableHead className="text-right text-xs font-bold text-muted-foreground uppercase pr-6">Ações</TableHead>
+      <Table>
+        <TableHeader className="bg-muted/30">
+          <TableRow>
+            <TableHead className="w-[300px] text-xs font-bold text-muted-foreground uppercase">Título</TableHead>
+            <TableHead className="text-xs font-bold text-muted-foreground uppercase">Disciplina</TableHead>
+            <TableHead className="text-xs font-bold text-muted-foreground uppercase">Tipo</TableHead>
+            <TableHead className="text-xs font-bold text-muted-foreground uppercase">Publicado</TableHead>
+            <TableHead className="text-right text-xs font-bold text-muted-foreground uppercase pr-6">Ações</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {materials.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">Nenhum material publicado.</TableCell>
+            </TableRow>
+          ) : (
+            materials.map((material) => (
+              <TableRow key={material.id}>
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-3">
+                    <div className="size-8 rounded bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                      <FileText className="size-4" />
+                    </div>
+                    <span className="text-sm font-bold text-foreground">{material.title}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-sm text-muted-foreground">{material.course}</TableCell>
+                <TableCell>
+                  <span className="text-[10px] font-bold bg-muted text-muted-foreground px-2 py-1 rounded uppercase">
+                    {material.type}
+                  </span>
+                </TableCell>
+                <TableCell className="text-sm text-muted-foreground">{material.date}</TableCell>
+                <TableCell className="text-right pr-6">
+                  <div className="flex items-center justify-end gap-2">
+                    <Button variant="outline" size="icon" className="size-8 text-muted-foreground hover:text-foreground" onClick={() => openEditModal(material)} title="Editar">
+                      <Pencil className="size-4" />
+                    </Button>
+                    <Button variant="outline" size="icon" className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:border-destructive/20" onClick={() => handleDelete(material.id)} title="Excluir">
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {materials.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">Nenhum material publicado.</TableCell>
-                </TableRow>
-              ) : (
-                materials.map((material) => (
-                  <TableRow key={material.id}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-3">
-                        <div className="size-8 rounded bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                          <FileText className="size-4" />
-                        </div>
-                        <span className="text-sm font-bold text-foreground">{material.title}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{material.course}</TableCell>
-                    <TableCell>
-                      <span className="text-[10px] font-bold bg-muted text-muted-foreground px-2 py-1 rounded uppercase">
-                        {material.type}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{material.date}</TableCell>
-                    <TableCell className="text-right pr-6">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button variant="outline" size="icon" className="size-8 text-muted-foreground hover:text-foreground" onClick={() => openEditModal(material)} title="Editar">
-                          <Pencil className="size-4" />
-                        </Button>
-                        <Button variant="outline" size="icon" className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:border-destructive/20" onClick={() => handleDelete(material.id)} title="Excluir">
-                          <Trash2 className="size-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            ))
+          )}
+        </TableBody>
+      </Table>
 
       <Dialog open={isEditOpen} onOpenChange={onOpenEditChange}>
         <DialogContent className="sm:max-w-md">

@@ -10,6 +10,7 @@ import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 import { registerSchema } from "@/schemas/auth"
+import { paths } from "@/routes/paths"
 
 export function RegisterPage() {
   const navigate = useNavigate()
@@ -78,7 +79,7 @@ export function RegisterPage() {
             <p className="text-sm text-muted-foreground mb-8">
               Sua conta foi criada com sucesso. Você já pode acessar a plataforma utilizando sua matrícula e senha.
             </p>
-            <Button onClick={() => navigate("/login")} className="w-full" size="lg">
+            <Button onClick={() => navigate(paths.login)} className="w-full" size="lg">
               Ir para o Login
             </Button>
           </CardContent>
@@ -196,7 +197,7 @@ export function RegisterPage() {
               <div className="text-center mt-2">
                 <p className="text-sm text-muted-foreground font-medium">
                   Já tem uma conta?{" "}
-                  <NavLink to="/login" className="font-bold text-primary hover:underline">
+                  <NavLink to={paths.login} className="font-bold text-primary hover:underline">
                     Entrar aqui
                   </NavLink>
                 </p>
