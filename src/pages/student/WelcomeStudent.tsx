@@ -13,7 +13,7 @@ import { StatCard } from "@/components/shared/StatCard"
 import { StatGrid } from "@/components/shared/StatGrid"
 import { SectionHeading } from "@/components/shared/SectionHeading"
 import { ShortcutCard } from "@/components/shared/ShortcutCard"
-import Dashboard from "./Dashboard"
+import Dashboard from "./pages/dashboard/Dashboard"
 
 function WelcomeStudent() {
   return (

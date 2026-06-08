@@ -36,7 +36,7 @@ function WelcomeMonitor() {
       <div className="mx-auto w-full max-w-5xl space-y-6">
         <WelcomeHeader
           title="Bem-vindo, Brenda Lima"
-          subtitle="Sexta-feira, 5 de junho de 2026 · Você tem 1 sessão hoje."
+          subtitle="Sexta-feira, 5 de junho de 2026. Você tem 1 sessão hoje."
         />
 
         <StatGrid>
@@ -92,8 +92,8 @@ function WelcomeMonitor() {
         <section className="space-y-3">
           <SectionHeading title="Atalhos rápidos" />
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <ShortcutCard icon={<FileText className="size-5" />} title="Publicar Material" description="Disponibilize apostilas, listas e slides" to="#" />
-            <ShortcutCard icon={<ClipboardList className="size-5" />} title="Meus Horários" description="Veja salas e horários das suas sessões" to="#" />
+            <ShortcutCard icon={<FileText className="size-5" />} title="Publicar Material" description="Disponibilize apostilas, listas e slides" to="/monitor/materials" />
+            <ShortcutCard icon={<ClipboardList className="size-5" />} title="Meus Horários" description="Veja salas e horários das suas sessões" to="/monitor/" />
             <ShortcutCard icon={<MessageSquare className="size-5" />} title="Fórum da Monitoria" description="Responda dúvidas e converse com a turma" to="/monitor/forum" />
           </div>
         </section>

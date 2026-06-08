@@ -56,17 +56,5 @@ export const router = createBrowserRouter([
   {
     path: "/ds",
     element: <DesignSystem />,
-  },
-  // {
-  //   path: "/monitorSchedule",
-  //   element: <MonitorSchedulePage />
-  // },
-  // {
-  //   path: "availableMonitorings",
-  //   element: <AvailableMonitoringsPage />,
-  // },
-  // {
-  //   path: "/specificMonitoring",
-  //   element: <SpecificMonitoringPage />,
-  // },
+  }
 ])

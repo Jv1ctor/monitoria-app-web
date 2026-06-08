@@ -2,8 +2,9 @@ import { WelcomeMonitor } from "./WelcomeMonitor";
 import { ForumListPage } from "../forum/ForumList";
 import { ForumTopicPage } from "../forum/ForumTopic";
 import { monitorLoader } from "@/loader/monitor.loader";
-import { MaterialsListPage } from "./pages/materials/materialsList";
-import NextSessions from "../../pages/teachingAssistant/DashboardTeaching";
+import { MaterialsListPage } from "../monitor/pages/materials/MaterialsList";
+import NextSessions from "../monitor/pages/teachingAssistant/DashboardTeaching";
+import { AvailableMonitoringsPage } from "../student/pages/availableMonitoring/AvailableMonitorings";
 
 export const monitorRoutes = [
   { index: true, handle: { title: "Inicio" }, element: <WelcomeMonitor /> },
@@ -15,6 +16,10 @@ export const monitorRoutes = [
   {
     path: "teaching",
     element: <NextSessions />,
+  },
+  {
+    path: "availableMonitorings",
+    element: <AvailableMonitoringsPage />,
   },
   {
     path: "forum",
