@@ -9,6 +9,7 @@ import type { Monitoring } from "@/types/student/Monitoring.type"
 import { formatData, formatHora, hoje } from "@/lib/data-format.lib"
 import { SectionHeading } from "@/components/shared/SectionHeading"
 import { NavLink } from "react-router"
+import { studentMaterial } from "@/routes/paths"
 
 
 
@@ -90,7 +91,7 @@ const Dashboard = () => {
                                         </div>
 
                                         <Button variant="outline" size="sm">
-                                            <NavLink to='/student'>
+                                            <NavLink to={studentMaterial(item.id)}>
                                                 Ver detalhes
                                             </NavLink>
                                         </Button>

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { NavLink } from "react-router"
+import { paths } from "@/routes/paths"
 
 function HeroPublic() {
     return (
@@ -11,10 +12,10 @@ function HeroPublic() {
                 Encontre monitores qualificados ou ofereça suas habilidades para ajudar outros estudantes a alcançarem seus objetivos.
             </p>
             <div className="flex items-center justify-center gap-2">
-                <NavLink to='/ds'>
+                <NavLink to={paths.designSystem}>
                     <Button>Encontrar Monitor</Button>
                 </NavLink>
-                <NavLink to='/ds'>
+                <NavLink to={paths.designSystem}>
                     <Button variant='outline'>Sou monitor</Button>
                 </NavLink>
             </div>

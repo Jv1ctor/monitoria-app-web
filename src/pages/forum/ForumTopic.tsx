@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { getInitials } from "@/lib/getInitials"
 import type { User } from "@/types/User"
 import type { Reply } from "@/types/forum/Reply.type"
+import { forumByRole } from "@/routes/paths"
 import { initialReplies, initialTopics } from "./forum.mock"
 
 export function ForumTopicPage() {
@@ -25,7 +26,7 @@ export function ForumTopicPage() {
     return (
       <div className="max-w-4xl mx-auto py-12 px-6 w-full text-center">
         <h1 className="text-2xl font-bold text-foreground mb-4">Tópico não encontrado</h1>
-        <NavLink to={`/${role}/forum`}>
+        <NavLink to={forumByRole[role]}>
           <Button variant="outline">Voltar ao fórum</Button>
         </NavLink>
       </div>
@@ -56,7 +57,7 @@ export function ForumTopicPage() {
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-6 w-full">
-      <NavLink to={`/${role}/forum`} className="inline-flex items-center text-sm font-semibold text-muted-foreground hover:text-foreground mb-6 transition-colors">
+      <NavLink to={forumByRole[role]} className="inline-flex items-center text-sm font-semibold text-muted-foreground hover:text-foreground mb-6 transition-colors">
         <ChevronLeft className="mr-1 size-4" />
         Voltar ao fórum
       </NavLink>

@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { studentMaterial } from "@/routes/paths"
 
 
 const initialEnrolled = [
@@ -150,7 +151,7 @@ export function SpecificMonitoringPage() {
   }
 
   const handleViewContent = (id: string) => {
-    navigate("/student/subject")
+    navigate(studentMaterial(id))
   }
 
   return (

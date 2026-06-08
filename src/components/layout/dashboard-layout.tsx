@@ -33,12 +33,7 @@ type DashboardLayoutProps = {
 }
 
 function DashboardLayout(props: DashboardLayoutProps) {
-  const initials = getInitials(
-    {
-      firstName: props.firstName, 
-      lastName: props.lastName
-    }
-  )
+  const initials = getInitials({firstName: props.firstName, lastName: props.lastName})
   return (
     <div className="flex flex-col min-h-svh">
       <Topbar
@@ -74,7 +69,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                       {props.navs.map((nav) => (
                         <SheetClose asChild key={nav.label}>
                           <NavLink to={nav.path}>
-                            <Button variant="ghost">{nav.path}</Button>
+                            <Button variant="ghost">{nav.label}</Button>
                           </NavLink>
                         </SheetClose>
                       ))}

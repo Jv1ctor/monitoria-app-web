@@ -1,8 +1,6 @@
 import { ForumListPage } from "../forum/ForumList";
 import { ForumTopicPage } from "../forum/ForumTopic";
-import { MonitorSchedulePage } from "../monitor/pages/schedule/MonitorSchedule";
 import { AvailableMonitoringsPage } from "./pages/availableMonitoring/AvailableMonitorings";
-import Dashboard from "./pages/dashboard/Dashboard";
 import RatingTeachingAssistant from "./pages/ratingTeacher/RatingTeachingAssistant";
 import { SpecificMonitoringPage } from "./pages/specificMonitoring/SpecificMonitoring";
 import { WelcomeStudent } from "./WelcomeStudent";
@@ -10,10 +8,6 @@ import { studentLoader } from "@/loader/student.loader";
 
 export const studentRoutes = [
   { index: true, element: <WelcomeStudent /> },
-  {
-    path: "frequency",
-    element: <RatingTeachingAssistant />,
-  },
   {
     path: "availableMonitorings",
     element: <AvailableMonitoringsPage />,
@@ -23,9 +17,13 @@ export const studentRoutes = [
     element: <SpecificMonitoringPage />,
   },
   {
-    path: "materials",
+    path: "materials/:id",
     element: <RatingTeachingAssistant />,
   },
+  // {
+  //   path: "frequencies",
+  //   element: <FrequencyStudent />,
+  // },
   {
     path: "forum",
     loader: studentLoader,

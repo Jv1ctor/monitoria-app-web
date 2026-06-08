@@ -2,6 +2,7 @@ import { useState } from "react"
 import { ChevronLeft, Download, FileText } from "lucide-react"
 import { Link } from "react-router"
 import type { Material } from "@/types/student/Material.type"
+import { paths } from "@/routes/paths"
 import { toast } from "sonner"
 
 import {
@@ -74,7 +75,7 @@ export default function RatingTeachingAssistant() {
         <div className="px-4 py-6 md:px-8 md:py-8">
             <div className="mx-auto w-full max-w-5xl space-y-4">
                 <Link
-                    to="/student/dashboard"
+                    to={paths.student}
                     className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
                 >
                     <ChevronLeft className="size-4" />

@@ -19,6 +19,7 @@ import {
 import { createTopicSchema } from "@/schemas/forum"
 import type { User } from "@/types/User"
 import type { Topic } from "@/types/forum/Topic.type"
+import { forumByRole } from "@/routes/paths"
 import { initialTopics } from "./forum.mock"
 
 const COURSES = [
@@ -46,7 +47,7 @@ export function ForumListPage() {
   }
 
   const handleCardClick = (topicId: string) => {
-    navigate(`/${role}/forum/${topicId}`)
+    navigate(`${forumByRole[role]}/${topicId}`)
   }
 
   const handleCreateSubmit = (e: React.FormEvent) => {

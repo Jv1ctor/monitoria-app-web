@@ -18,6 +18,7 @@ import { ScheduleCard } from "@/components/shared/ScheduleCard"
 import { ShortcutCard } from "@/components/shared/ShortcutCard"
 import type { Session } from "@/types/monitor/Session.type"
 import { formatHora, hoje } from "@/lib/data-format.lib"
+import { paths } from "@/routes/paths"
 
 const MOCK_SESSOES: Session[] = [
   { id: 1, disciplina: "Cálculo I", local: "Sala C-201", dataISO: "2026-06-05T14:00:00-03:00" },
@@ -92,9 +93,9 @@ function WelcomeMonitor() {
         <section className="space-y-3">
           <SectionHeading title="Atalhos rápidos" />
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <ShortcutCard icon={<FileText className="size-5" />} title="Publicar Material" description="Disponibilize apostilas, listas e slides" to="/monitor/materials" />
-            <ShortcutCard icon={<ClipboardList className="size-5" />} title="Meus Horários" description="Veja salas e horários das suas sessões" to="/monitor/" />
-            <ShortcutCard icon={<MessageSquare className="size-5" />} title="Fórum da Monitoria" description="Responda dúvidas e converse com a turma" to="/monitor/forum" />
+            <ShortcutCard icon={<FileText className="size-5" />} title="Publicar Material" description="Disponibilize apostilas, listas e slides" to={paths.monitorMaterials} />
+            <ShortcutCard icon={<ClipboardList className="size-5" />} title="Meus Horários" description="Veja salas e horários das suas sessões" to={paths.monitor} />
+            <ShortcutCard icon={<MessageSquare className="size-5" />} title="Fórum da Monitoria" description="Responda dúvidas e converse com a turma" to={paths.monitorForum} />
           </div>
         </section>
       </div>
