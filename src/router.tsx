@@ -13,6 +13,7 @@ import RatingTeachingAssistant from "./pages/student/RatingTeachingAssistant"
 import { MonitorSchedulePage } from "@/pages/schedule/MonitorSchedule"
 import { MaterialsListPage } from "./pages/materials/materialsList"
 import { AvailableMonitoringsPage } from "@/pages/student/AvailableMonitorings"
+import AdminStudents from "./pages/admin/adminStudents"
 
 export const router = createBrowserRouter([
   {
@@ -58,14 +59,19 @@ export const router = createBrowserRouter([
   {
     path: "/monitorSchedule",
     element: <MonitorSchedulePage />
-  }
-
+  },
+  {
     path: "/materials",
     element: <MaterialsListPage />,
   },
   {
-    path: "availableMonitorings",
+    path: "/availableMonitorings",
     element: <AvailableMonitoringsPage />,
   },
+  { path: "/admin",
+    element: <DashboardLayout />,
+    children: [{ path: "students", index: true, element: <AdminStudents /> }],
+
+  }
   
 ])
