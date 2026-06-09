@@ -11,6 +11,7 @@ import {
   SheetTrigger,
 } from "../ui/sheet"
 import { Outlet } from "react-router"
+import { paths } from "@/routes/paths"
 
 function PublicLayout() {
   return (
@@ -21,10 +22,10 @@ function PublicLayout() {
           <div className="flex flex-row items-center lg:gap-4">
             <div className="hidden lg:flex items-center gap-4">
               <Button variant="ghost">
-                <NavLink to={"/login"}>Entrar</NavLink>
+                <NavLink to={paths.login}>Entrar</NavLink>
               </Button>
               <Button>
-                <NavLink to={"/register"}>Cadastrar</NavLink>
+                <NavLink to={paths.register}>Cadastrar</NavLink>
               </Button>
             </div>
             <div className="flex lg:hidden justify-start md:justify-between">
@@ -38,12 +39,12 @@ function PublicLayout() {
                   <SheetHeader>
                     <div className="flex flex-col justify-center items-center gap-5">
                       <SheetClose asChild>
-                        <NavLink to={"/ds"}>
+                        <NavLink to={paths.designSystem}>
                           <Button variant="outline">Entrar</Button>
                         </NavLink>
                       </SheetClose>
                       <SheetClose asChild>
-                        <NavLink to={"/ds"}>
+                        <NavLink to={paths.designSystem}>
                           <Button>Cadastrar</Button>
                         </NavLink>
                       </SheetClose>

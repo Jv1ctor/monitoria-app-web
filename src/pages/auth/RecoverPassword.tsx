@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field"
 import { recoverPasswordSchema } from "@/schemas/auth"
+import { paths } from "@/routes/paths"
 
 export function RecoverPasswordPage() {
   const [isLoading, setIsLoading] = React.useState(false)
@@ -56,7 +57,7 @@ export function RecoverPasswordPage() {
             <p className="text-sm text-muted-foreground mb-8">
               Se o e-mail informado estiver cadastrado em nosso sistema, enviamos um link de redefinição de senha para a sua caixa de entrada.
             </p>
-            <NavLink to="/login" className="w-full">
+            <NavLink to={paths.login} className="w-full">
               <Button className="w-full" size="lg">
                 Voltar para o Login
               </Button>
@@ -113,7 +114,7 @@ export function RecoverPasswordPage() {
               <div className="text-center mt-2">
                 <p className="text-xs text-muted-foreground font-medium">
                   Lembrou da senha?{" "}
-                  <NavLink to="/login" className="font-bold text-primary hover:underline">
+                  <NavLink to={paths.login} className="font-bold text-primary hover:underline">
                     Entrar
                   </NavLink>
                 </p>
