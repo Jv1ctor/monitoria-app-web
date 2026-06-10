@@ -1,60 +1,62 @@
-import { createBrowserRouter } from "react-router"
+import { createBrowserRouter, Navigate } from "react-router"
 import { DesignSystem } from "./pages/DesignSystem"
 import { PublicLayout } from "./components/layout/public-layout"
 import { PublicPage } from "./pages/PublicPage/PublicPage"
-import Dashboard from "./pages/student/Dashboard"
-import { DashboardLayout } from "./components/layout/dashboard-layout"
+import { Layout } from "./components/layout/auth-layout"
 import { LoginPage } from "./pages/auth/Login"
 import { RegisterPage } from "./pages/auth/Register"
 import { RecoverPasswordPage } from "./pages/auth/RecoverPassword"
-import { ForumListPage } from "./pages/forum/ForumList"
-import { ForumTopicPage } from "./pages/forum/ForumTopic"
-import RatingTeachingAssistant from "./pages/student/RatingTeachingAssistant"
-import { MonitorSchedulePage } from "@/pages/schedule/MonitorSchedule"
-import { MaterialsListPage } from "./pages/materials/materialsList"
-import { AvailableMonitoringsPage } from "@/pages/student/AvailableMonitorings"
-import AdminStudents from "./pages/admin/adminStudents"
+import { authLoader } from "./loader/auth.loader"
+import { studentRoutes } from "./pages/student/routes"
+import { monitorRoutes } from "./pages/monitor/routes"
+import { adminRoutes } from "./pages/admin/routes"
+import { guestGuardMiddleware } from "./middleware/guestGuard.middleware"
+import { majorLoader } from "./loader/major.loader"
+import { SpinnerFallback } from "./components/shared/SpinnerFallback"
 
 export const router = createBrowserRouter([
+  {
+    path: "*",
+    element: <Navigate to="/" replace />,
+  },
   {
     path: "/",
     element: <PublicLayout />,
     children: [{ index: true, element: <PublicPage /> }],
-    loader: () => console.log("Executa sempre quando carrega uma page"),
   },
   {
     path: "/login",
     element: <LoginPage />,
+    middleware: [guestGuardMiddleware],
   },
   {
     path: "/register",
-    element: <RegisterPage />
+    element: <RegisterPage />,
+    loader: majorLoader,
+    hydrateFallbackElement: <SpinnerFallback />,
+    middleware: [guestGuardMiddleware],
   },
   {
     path: "/recover",
-    element: <RecoverPasswordPage/>,
-  },
-  {
-    path: "/forum",
-    element: <ForumListPage />,
-  },
-  {
-    path: "/forum/:id",
-    element: <ForumTopicPage />,
-  },
-  {
-    path: "/ds",
-    element: <DesignSystem />,
+    element: <RecoverPasswordPage />,
   },
   {
     path: "/student",
-    element: <DashboardLayout />,
-    children: [{ path: "dashboard", index: true, element: <Dashboard /> }],
+    element: <Layout />,
+    loader: authLoader,
+    children: [...studentRoutes],
   },
   {
-    path: "/student",
-    element: <DashboardLayout />,
-    children: [{ path: "subject", index: true, element: <RatingTeachingAssistant /> }],
+    path: "/monitor",
+    element: <Layout />,
+    loader: authLoader,
+    children: [...monitorRoutes],
+  },
+  {
+    path: "/admin",
+    element: <Layout />,
+    loader: authLoader,
+    children: [...adminRoutes],
   },
   {
     path: "/monitorSchedule",
@@ -68,10 +70,12 @@ export const router = createBrowserRouter([
     path: "/availableMonitorings",
     element: <AvailableMonitoringsPage />,
   },
-  { path: "/admin",
-    element: <DashboardLayout />,
-    children: [{ path: "students", index: true, element: <AdminStudents /> }],
-
-  }
-  
+  {
+    path: "/ds",
+    element: <DesignSystem />,
+  },
+  {
+    path: "/studentAttendance",
+    element: <StudentAttendancePage />,
+  },
 ])

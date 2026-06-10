@@ -4,6 +4,7 @@ import { useNavigate } from "react-router"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { paths } from "@/routes/paths"
 
 const mockMonitorings = [
   { id: "1", title: "Desenvolvimento Web Front-End", course: "Ciência da Computação", code: "COMP011", monitorsCount: 3 },
@@ -47,8 +48,8 @@ export function AvailableMonitoringsPage() {
     }
   }
 
-  const handleCardClick = (id: string) => {
-    navigate("") //é pra ir pra pag especifica 
+  const handleCardClick = (title: string) => {
+    navigate(paths.studentMonitorings, { state: { subjectTitle: title } })
   }
 
   return (
@@ -61,7 +62,7 @@ export function AvailableMonitoringsPage() {
         {currentMonitorings.map((item) => (
           <Card 
             key={item.id} 
-            onClick={() => handleCardClick(item.id)}
+            onClick={() => handleCardClick(item.title)}
             className="shadow-sm border-border hover:border-[#0047BA]/40 hover:shadow-md transition-all cursor-pointer group flex flex-col h-full"
           >
             <CardContent className="p-5 flex flex-col h-full">
