@@ -7,6 +7,7 @@ import {
   MessageSquare,
   Search,
 } from "lucide-react"
+import { useLoaderData } from "react-router"
 
 import { WelcomeHeader } from "@/components/shared/WelcomeHeader"
 import { StatCard } from "@/components/shared/StatCard"
@@ -15,25 +16,53 @@ import { SectionHeading } from "@/components/shared/SectionHeading"
 import { ShortcutCard } from "@/components/shared/ShortcutCard"
 import Dashboard from "./pages/dashboard/Dashboard"
 import { paths } from "@/routes/paths"
+import type { StudentDashboardLoaderResult } from "@/loaders/student-dashboard.loader"
+import { formatHora } from "@/lib/data-format.lib"
 
 function WelcomeStudent() {
+  const { me, enrolledLessons, stats } = useLoaderData<StudentDashboardLoaderResult>()
+
+  const title = `Bem-vindo, ${me.first_name} ${me.last_name}`
+
+  const today = new Date().toLocaleDateString("pt-BR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })
+
+  const subtitle =
+    stats.upcomingCount > 0
+      ? `${today.charAt(0).toUpperCase() + today.slice(1)} · Você tem ${stats.upcomingCount} monitoria(s) agendada(s).`
+      : "Nenhuma monitoria agendada."
+
+  const uniqueDisciplines = new Set(enrolledLessons.map((l) => l.class_id)).size
+
+  const nextLessonText =
+    enrolledLessons.length > 0
+      ? (() => {
+          const sorted = [...enrolledLessons].sort(
+            (a, b) => new Date(a.date_time).getTime() - new Date(b.date_time).getTime()
+          )
+          const first = sorted[0]
+          return `${formatHora(first.date_time)} · ${first.modality}`
+        })()
+      : "--:--"
+
   return (
     <div className="px-4 py-6 md:px-8 md:py-8">
       <div className="mx-auto w-full max-w-5xl space-y-6">
-        <WelcomeHeader
-          title="Bem-vindo, João Silva"
-          subtitle="Sexta-feira, 5 de junho de 2026 · Você tem 1 monitoria hoje."
-        />
+        <WelcomeHeader title={title} subtitle={subtitle} />
 
         <StatGrid>
-          <StatCard icon={<CalendarCheck className="size-5" />} label="Frequência geral" value="85%" hint="Acima da meta de 75%" />
-          <StatCard icon={<Calendar className="size-5" />} label="Monitorias agendadas" value="3" hint="Nos próximos 7 dias" />
-          <StatCard icon={<BookOpen className="size-5" />} label="Disciplinas acompanhadas" value="4" hint="Neste semestre" />
-          <StatCard icon={<Clock className="size-5" />} label="Próxima monitoria" value="14:00" hint="Cálculo I · Sala C-201" />
+          <StatCard icon={<CalendarCheck className="size-5" />} label="Frequência geral" value={`${stats.attendanceRate}%`} hint="Acima da meta de 75%" />
+          <StatCard icon={<Calendar className="size-5" />} label="Monitorias agendadas" value={`${stats.upcomingCount}`} hint="Nos próximos 7 dias" />
+          <StatCard icon={<BookOpen className="size-5" />} label="Disciplinas acompanhadas" value={`${uniqueDisciplines}`} hint="Neste semestre" />
+          <StatCard icon={<Clock className="size-5" />} label="Próxima monitoria" value={nextLessonText} hint={enrolledLessons.length > 0 ? enrolledLessons[0].modality : "Sem monitorias"} />
         </StatGrid>
 
         <section className="space-y-3">
-          <Dashboard/>
+          <Dashboard lessons={enrolledLessons} />
         </section>
 
         <section className="space-y-3">
