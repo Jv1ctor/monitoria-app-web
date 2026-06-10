@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router"
+import { NavLink, Outlet, useNavigate } from "react-router"
 import { List, LogOut } from "lucide-react"
 
 import { Button } from "../ui/button"
@@ -14,6 +14,8 @@ import {
 } from "../ui/sheet"
 import { cn } from "@/lib/utils"
 import { getInitials } from "@/lib/getInitials"
+import { useAuth } from "@/hooks/use-auth.hook"
+import { paths } from "@/routes/paths"
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) => (
   cn(
@@ -33,7 +35,15 @@ type DashboardLayoutProps = {
 }
 
 function DashboardLayout(props: DashboardLayoutProps) {
+  const { logout } = useAuth()
+  const navigate = useNavigate()
   const initials = getInitials({firstName: props.firstName, lastName: props.lastName})
+
+  const handleLogout = () => {
+    logout()
+    navigate(paths.login)
+  }
+
   return (
     <div className="flex flex-col min-h-svh">
       <Topbar
@@ -52,6 +62,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
               <Button
                 size="icon-xl"
                 className="cursor-pointer rounded-full border-2 border-muted bg-transparent w-10 h-10 text-foreground hover:border-red-100 hover:bg-red-100 hover:text-red-600"
+                onClick={handleLogout}
               >
                 <LogOut />
               </Button>
@@ -88,6 +99,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                         <Button
                           size="icon-xl"
                           className="ml-auto cursor-pointer rounded-full border-2 border-muted bg-transparent w-10 h-10 text-foreground hover:border-red-100 hover:bg-red-100 hover:text-red-600"
+                          onClick={handleLogout}
                         >
                           <LogOut />
                         </Button>
