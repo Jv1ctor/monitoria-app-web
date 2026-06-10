@@ -1,29 +1,40 @@
 import * as React from "react"
-import { NavLink, useNavigate } from "react-router" 
-import { Book, Loader2 } from "lucide-react"
+import { NavLink, useNavigate } from "react-router"
+import { Book } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field"
+import { Spinner } from "@/components/ui/spinner"
 import { loginSchema } from "@/schemas/auth"
 import { paths } from "@/routes/paths"
+import { useAuth } from "@/hooks/use-auth.hook"
+import type { Role } from "@/types/roles/Role"
+
+const roleRedirect: Record<Role, string> = {
+  student: paths.student,
+  monitor: paths.monitor,
+  admin: paths.admin,
+}
 
 export const LoginPage = () => {
   const navigate = useNavigate()
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [formErrors, setFormErrors] = React.useState<{ enrollment?: string; password?: string }>({})
+  const { login, isLoading, user } = useAuth()
+  const [formErrors, setFormErrors] = React.useState<{ registration?: string; password?: string }>({})
+  const [globalError, setGlobalError] = React.useState<string>("")
 
-  const enrollmentRef = React.useRef<HTMLInputElement>(null)
+  const registrationRef = React.useRef<HTMLInputElement>(null)
   const passwordRef = React.useRef<HTMLInputElement>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setFormErrors({})
+    setGlobalError("")
 
     const data = {
-      enrollment: enrollmentRef.current?.value || "",
+      registration: registrationRef.current?.value || "",
       password: passwordRef.current?.value || "",
     }
 
@@ -32,34 +43,41 @@ export const LoginPage = () => {
     if (!result.success) {
       const errors: typeof formErrors = {}
       result.error.issues.forEach((issue) => {
-        if (issue.path[0] === "enrollment") errors.enrollment = issue.message
+        if (issue.path[0] === "registration") errors.registration = issue.message
         if (issue.path[0] === "password") errors.password = issue.message
       })
       setFormErrors(errors)
       return
     }
 
-    setIsLoading(true)
+    const { registration, password } = result.data
 
-    await new Promise((resolve) => setTimeout(resolve, 1200))
+    const apiResult = await login(registration, password)
 
-    const { enrollment, password } = result.data
-
-    if (enrollment === "2222222" && password === "aluno123") {
-      toast.success("Login efetuado com sucesso!")
-      navigate(paths.home)
-    } else if (enrollment === "1111111" && password === "monitor123") {
-      toast.success("Bem-vindo, Monitor!")
-      navigate(paths.home)
-    } else if (enrollment === "0000000" && password === "admin123") {
-      toast.success("Bem vindo, Coordenador!")
-      navigate(paths.home)
-    } else {
-      toast.error("Matrícula ou senha inválida. Tente novamente.")
+    if (!apiResult.success) {
+      if (apiResult.fieldErrors) {
+        const errors: typeof formErrors = {}
+        apiResult.fieldErrors.forEach((err) => {
+          if (err.field === "registration") errors.registration = err.message
+          if (err.field === "password") errors.password = err.message
+        })
+        setFormErrors(errors)
+      }
+      if (apiResult.errorMessage) {
+        setGlobalError(apiResult.errorMessage)
+      }
+      return
     }
 
-    setIsLoading(false)
+    toast.success("Login efetuado com sucesso!")
   }
+
+  React.useEffect(() => {
+    if (user) {
+      const role = user.roles[0]?.role ?? "student"
+      navigate(roleRedirect[role] ?? paths.student)
+    }
+  }, [user, navigate])
 
   return (
     <div className="min-h-svh flex flex-col items-center justify-center bg-background px-6 py-12">
@@ -76,19 +94,19 @@ export const LoginPage = () => {
         </p>
       </div>
 
-      <Card className="w-full max-w-[440px] shadow-card border-border rounded-lg">
+      <Card className="w-full max-w-110 shadow-card border-border rounded-lg">
         <CardContent className="p-8">
           <form onSubmit={handleSubmit}>
             <FieldGroup className="gap-5">
-              
+
               <Field>
                 <FieldLabel>Matrícula</FieldLabel>
                 <Input
-                  ref={enrollmentRef}
+                  ref={registrationRef}
                   placeholder="Digite sua matrícula"
-                  className={formErrors.enrollment ? "border-destructive focus-visible:ring-destructive/30" : ""}
+                  className={formErrors.registration ? "border-destructive focus-visible:ring-destructive/30" : ""}
                 />
-                {formErrors.enrollment && <FieldError errors={[{ message: formErrors.enrollment }]} />}
+                {formErrors.registration && <FieldError errors={[{ message: formErrors.registration }]} />}
               </Field>
 
               <Field>
@@ -118,10 +136,14 @@ export const LoginPage = () => {
                 </NavLink>
               </div>
 
+              {globalError && (
+                <p className="text-sm text-destructive font-medium">{globalError}</p>
+              )}
+
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? (
                   <>
-                    <Loader2 className="animate-spin size-4" />
+                    <Spinner className="size-4" />
                     Entrando...
                   </>
                 ) : (

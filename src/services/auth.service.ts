@@ -96,18 +96,5 @@ async function registerRequest(
   }
 }
 
-type Major = {
-  id: string
-  name: string
-  code?: string
-}
-
-async function getMajors(): Promise<Major[]> {
-  return handleRequest<Major[]>({
-    method: "GET",
-    url: "/major",
-  })
-}
-
-export { loginRequest, registerRequest, getMajors }
-export type { Major, LoginPayload, RegisterServicePayload }
+export { loginRequest, registerRequest }
+export type { LoginPayload, RegisterServicePayload }
