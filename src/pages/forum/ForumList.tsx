@@ -5,9 +5,6 @@ import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Sheet,
   SheetContent,
@@ -16,29 +13,29 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { createTopicSchema } from "@/schemas/forum"
+// import { createTopicSchema } from "@/schemas/forum"
 import type { User } from "@/types/User"
 import type { Topic } from "@/types/forum/Topic.type"
 import { forumByRole } from "@/routes/paths"
 import { initialTopics } from "./forum.mock"
 
-const COURSES = [
-  { value: "calculo1", label: "Cálculo I" },
-  { value: "estrutura", label: "Estrutura de Dados" },
-  { value: "discreta", label: "Matemática Discreta" },
-]
+// const COURSES = [
+//   { value: "calculo1", label: "Cálculo I" },
+//   { value: "estrutura", label: "Estrutura de Dados" },
+//   { value: "discreta", label: "Matemática Discreta" },
+// ]
 
 export function ForumListPage() {
   const navigate = useNavigate()
   const { id } = useLoaderData() as User
   const role = id.role.role
   const [topics, setTopics] = React.useState<Topic[]>(initialTopics)
-  
+
   const [isSheetOpen, setIsSheetOpen] = React.useState(false)
-  const [selectedCourse, setSelectedCourse] = React.useState("")
-  const [formErrors, setFormErrors] = React.useState<Record<string, string>>({})
-  const titleRef = React.useRef<HTMLInputElement>(null)
-  const contentRef = React.useRef<HTMLTextAreaElement>(null)
+  // const [selectedCourse, setSelectedCourse] = React.useState("")
+  // const [, setFormErrors] = React.useState<Record<string, string>>({})
+  // const titleRef = React.useRef<HTMLInputElement>(null)
+  // const contentRef = React.useRef<HTMLTextAreaElement>(null)
 
   const handleDelete = (e: React.MouseEvent, topicId: string) => {
     e.stopPropagation() // vai evitar que o clique na lixeira abra o card do tópico
@@ -50,43 +47,44 @@ export function ForumListPage() {
     navigate(`${forumByRole[role]}/${topicId}`)
   }
 
-  const handleCreateSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setFormErrors({})
+  // TODO: reativar quando o formulário de criação de tópico for implementado
+  // const handleCreateSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault()
+  //   setFormErrors({})
 
-    const data = { 
-      course: selectedCourse, 
-      title: titleRef.current?.value || "", 
-      content: contentRef.current?.value || "" 
-    }
-    
-    const result = createTopicSchema.safeParse(data)
+  //   const data = {
+  //     course: selectedCourse,
+  //     title: titleRef.current?.value || "",
+  //     content: contentRef.current?.value || ""
+  //   }
+  //
+  //   const result = createTopicSchema.safeParse(data)
 
-    if (!result.success) {
-      const errors: Record<string, string> = {}
-      result.error.issues.forEach((issue) => errors[issue.path[0] as string] = issue.message)
-      setFormErrors(errors)
-      return
-    }
+  //   if (!result.success) {
+  //     const errors: Record<string, string> = {}
+  //     result.error.issues.forEach((issue) => errors[issue.path[0] as string] = issue.message)
+  //     setFormErrors(errors)
+  //     return
+  //   }
 
-    const newTopic: Topic = {
-      id: Math.random().toString(),
-      title: data.title,
-      tag: COURSES.find(c => c.value === data.course)?.label || data.course,
-      preview: data.content,
-      author: { firstName: id.firstName, lastName: id.lastName },
-      date: "Agora",
-      repliesCount: 0
-    }
+  //   const newTopic: Topic = {
+  //     id: Math.random().toString(),
+  //     title: data.title,
+  //     tag: COURSES.find(c => c.value === data.course)?.label || data.course,
+  //     preview: data.content,
+  //     author: { firstName: id.firstName, lastName: id.lastName },
+  //     date: "Agora",
+  //     repliesCount: 0
+  //   }
 
-    setTopics([newTopic, ...topics])
-    toast.success("Tópico publicado!")
-    setIsSheetOpen(false) 
- 
-    setSelectedCourse("")
-    if (titleRef.current) titleRef.current.value = ""
-    if (contentRef.current) contentRef.current.value = ""
-  }
+  //   setTopics([newTopic, ...topics])
+  //   toast.success("Tópico publicado!")
+  //   setIsSheetOpen(false)
+  //
+  //   setSelectedCourse("")
+  //   if (titleRef.current) titleRef.current.value = ""
+  //   if (contentRef.current) contentRef.current.value = ""
+  // }
 
   return (
     <div className="max-w-5xl mx-auto py-8 px-6 w-full">

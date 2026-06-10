@@ -4,7 +4,6 @@ import { AvailableMonitoringsPage } from "./pages/availableMonitoring/AvailableM
 import RatingTeachingAssistant from "./pages/ratingTeacher/RatingTeachingAssistant";
 import { SpecificMonitoringPage } from "./pages/specificMonitoring/SpecificMonitoring";
 import { WelcomeStudent } from "./WelcomeStudent";
-import { studentLoader } from "@/loader/student.loader";
 
 export const studentRoutes = [
   { index: true, element: <WelcomeStudent /> },
@@ -26,12 +25,10 @@ export const studentRoutes = [
   // },
   {
     path: "forum",
-    loader: studentLoader,
     element: <ForumListPage />,
   },
   {
     path: "forum/:id",
-    loader: studentLoader,
     element: <ForumTopicPage />,
   },
 ]

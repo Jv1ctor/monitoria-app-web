@@ -6,12 +6,13 @@ import { Layout } from "./components/layout/auth-layout"
 import { LoginPage } from "./pages/auth/Login"
 import { RegisterPage } from "./pages/auth/Register"
 import { RecoverPasswordPage } from "./pages/auth/RecoverPassword"
-import { studentLoader } from "./loader/student.loader"
-import { monitorLoader } from "./loader/monitor.loader"
-import { adminLoader } from "./loader/admin.loader"
+import { authLoader } from "./loader/auth.loader"
 import { studentRoutes } from "./pages/student/routes"
 import { monitorRoutes } from "./pages/monitor/routes"
 import { adminRoutes } from "./pages/admin/routes"
+import { guestGuardMiddleware } from "./middleware/guestGuard.middleware"
+import { majorLoader } from "./loader/major.loader"
+import { SpinnerFallback } from "./components/shared/SpinnerFallback"
 
 export const router = createBrowserRouter([
   {
@@ -26,10 +27,14 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+    middleware: [guestGuardMiddleware],
   },
   {
     path: "/register",
     element: <RegisterPage />,
+    loader: majorLoader,
+    hydrateFallbackElement: <SpinnerFallback />,
+    middleware: [guestGuardMiddleware],
   },
   {
     path: "/recover",
@@ -38,23 +43,23 @@ export const router = createBrowserRouter([
   {
     path: "/student",
     element: <Layout />,
-    loader: studentLoader,
-    children: [...studentRoutes]
+    loader: authLoader,
+    children: [...studentRoutes],
   },
   {
     path: "/monitor",
     element: <Layout />,
-    loader: monitorLoader,
-    children: [...monitorRoutes]
+    loader: authLoader,
+    children: [...monitorRoutes],
   },
   {
     path: "/admin",
     element: <Layout />,
-    loader: adminLoader,
-    children: [...adminRoutes]
+    loader: authLoader,
+    children: [...adminRoutes],
   },
   {
     path: "/ds",
     element: <DesignSystem />,
-  }
+  },
 ])
