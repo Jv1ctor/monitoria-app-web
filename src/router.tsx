@@ -59,6 +59,18 @@ export const router = createBrowserRouter([
     children: [...adminRoutes],
   },
   {
+    path: "/monitorSchedule",
+    element: <MonitorSchedulePage />
+  },
+  {
+    path: "/materials",
+    element: <MaterialsListPage />,
+  },
+  {
+    path: "/availableMonitorings",
+    element: <AvailableMonitoringsPage />,
+  },
+  {
     path: "/ds",
     element: <DesignSystem />,
   },
