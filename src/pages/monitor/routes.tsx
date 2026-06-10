@@ -3,6 +3,7 @@ import { ForumListPage } from "../forum/ForumList";
 import { ForumTopicPage } from "../forum/ForumTopic";
 import { MaterialsListPage } from "../monitor/pages/materials/MaterialsList";
 import { AvailableMonitoringsPage } from "../student/pages/availableMonitoring/AvailableMonitorings";
+import { MonitorSchedulePage } from "./pages/schedule/MonitorSchedule";
 
 export const monitorRoutes = [
   { index: true, handle: { title: "Inicio" }, element: <WelcomeMonitor /> },
@@ -21,5 +22,9 @@ export const monitorRoutes = [
   {
     path: "forum/:id",
     element: <ForumTopicPage />,
+  },
+  {
+    path: "/monitorSchedule",
+    element: <MonitorSchedulePage />
   },
 ]

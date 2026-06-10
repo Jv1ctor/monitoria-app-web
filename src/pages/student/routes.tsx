@@ -3,6 +3,7 @@ import { ForumTopicPage } from "../forum/ForumTopic";
 import { AvailableMonitoringsPage } from "./pages/availableMonitoring/AvailableMonitorings";
 import RatingTeachingAssistant from "./pages/ratingTeacher/RatingTeachingAssistant";
 import { SpecificMonitoringPage } from "./pages/specificMonitoring/SpecificMonitoring";
+import { StudentAttendancePage } from "./StudentAttendance";
 import { WelcomeStudent } from "./WelcomeStudent";
 
 export const studentRoutes = [
@@ -19,10 +20,10 @@ export const studentRoutes = [
     path: "materials/:id",
     element: <RatingTeachingAssistant />,
   },
-  // {
-  //   path: "frequencies",
-  //   element: <FrequencyStudent />,
-  // },
+  {
+    path: "/studentAttendance",
+    element: <StudentAttendancePage />,
+  },
   {
     path: "forum",
     element: <ForumListPage />,

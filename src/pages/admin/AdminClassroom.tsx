@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { TurmaModal } from "./components/EditClassroom"
+import { TurmaModal } from "./components/TurmaModal"
 
 export default function AdminClassroom() {
     const [open, setOpen] = useState(true)
