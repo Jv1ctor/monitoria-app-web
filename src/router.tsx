@@ -62,8 +62,4 @@ export const router = createBrowserRouter([
     path: "/ds",
     element: <DesignSystem />,
   },
-  {
-    path: "/studentAttendance",
-    element: <StudentAttendancePage />,
-  },
 ])
