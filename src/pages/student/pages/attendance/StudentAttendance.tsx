@@ -1,4 +1,3 @@
-import * as React from "react"
 import {
   CheckCircle2,
   XCircle,
@@ -11,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import type { StudentAttendanceLoaderResult } from "@/loaders/student-attendance.loader"
 
 export function StudentAttendancePage() {
-  const { me, frequencies } = useLoaderData<StudentAttendanceLoaderResult>()
+  const { frequencies } = useLoaderData<StudentAttendanceLoaderResult>()
 
   const totalSessions = frequencies.length
   const totalPresences = frequencies.filter(

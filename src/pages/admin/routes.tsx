@@ -2,6 +2,7 @@ import { WelcomeAdmin } from "./WelcomeAdmin";
 import { AdminSubjectsPage } from "./pages/AdminSubjectsPage";
 import { AdminClassesPage } from "./pages/AdminClassesPage";
 import { AdminMonitorsPage } from "./pages/AdminMonitorsPage";
+import AdminStudents from "./pages/AdminStudents";
 
 export const adminRoutes = [
   { index: true, handle: { title: "Início" }, element: <WelcomeAdmin /> },
@@ -11,15 +12,15 @@ export const adminRoutes = [
   //   path: "rota (monitor)",
   //   element: <Pagina />,
   // },
-  // {
-  //   path: "classroom",
-  //   element: <AdminClassroom />,
-  //   handle: { title: "Gerenciar Turmas" },
-    
   {
-    path: "AdminSubjects", 
+    path: "subjects", 
     element: <AdminSubjectsPage />,
     handle: { title: "Disciplinas" }
+  },
+  {
+    path: "studentsClass",
+    element: <AdminStudents />,
+    handle: { title: "Gerenciar Turmas" },
   },
   {
     path: "classes",
