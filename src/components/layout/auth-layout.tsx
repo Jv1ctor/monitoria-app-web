@@ -8,15 +8,15 @@ type NavItem = { label: string; path: string }
 const ROLE_NAVS: Record<Role, NavItem[]> = {
   student: [
     { label: "Início", path: paths.student },
-    { label: "Buscar Disciplina", path: paths.studentSearch },
-    { label: "Minhas Monitorias", path: paths.studentMonitorings },
-    { label: "Frequência", path: paths.student },
+    { label: "Buscar Disciplina", path: paths.studentMonitorings },
+    { label: "Minhas Monitorias", path: paths.studentMyMonitorings },
+    { label: "Frequência", path: paths.studentFrequency },
     { label: "Fórum", path: paths.studentForum },
   ],
   monitor: [
     { label: "Início", path: paths.monitor },
     { label: "Materiais", path: paths.monitorMaterials },
-    { label: "Frequência", path: paths.monitor },
+    { label: "Aulas", path: paths.monitorLessons },
     { label: "Fórum", path: paths.monitorForum },
   ],
   admin: [
