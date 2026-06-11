@@ -5,14 +5,14 @@ import { PublicPage } from "./pages/PublicPage/PublicPage"
 import { Layout } from "./components/layout/auth-layout"
 import { LoginPage } from "./pages/auth/Login"
 import { RegisterPage } from "./pages/auth/Register"
-import { RecoverPasswordPage } from "./pages/auth/RecoverPassword"
-import { authLoader } from "./loader/auth.loader"
 import { studentRoutes } from "./pages/student/routes"
 import { monitorRoutes } from "./pages/monitor/routes"
 import { adminRoutes } from "./pages/admin/routes"
 import { guestGuardMiddleware } from "./middleware/guestGuard.middleware"
-import { majorLoader } from "./loader/major.loader"
+import { roleGuardMiddleware } from "./middleware/roleGuard.middleware"
+import { majorLoader } from "./loaders/major.loader"
 import { SpinnerFallback } from "./components/shared/SpinnerFallback"
+import { authLoader } from "./loaders/auth.loader"
 
 export const router = createBrowserRouter([
   {
@@ -37,19 +37,17 @@ export const router = createBrowserRouter([
     middleware: [guestGuardMiddleware],
   },
   {
-    path: "/recover",
-    element: <RecoverPasswordPage />,
-  },
-  {
     path: "/student",
     element: <Layout />,
     loader: authLoader,
+    middleware: [roleGuardMiddleware(["student"])],
     children: [...studentRoutes],
   },
   {
     path: "/monitor",
     element: <Layout />,
     loader: authLoader,
+    middleware: [roleGuardMiddleware(["monitor"])],
     children: [...monitorRoutes],
   },
   {
