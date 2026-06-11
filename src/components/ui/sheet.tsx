@@ -47,7 +47,7 @@ function SheetContent({
   className,
   children,
   side = "right",
-  overlay = false,
+  overlay = true,
   showCloseButton = true,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {

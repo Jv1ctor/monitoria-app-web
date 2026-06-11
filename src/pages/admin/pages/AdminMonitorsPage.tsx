@@ -1,10 +1,21 @@
 import * as React from "react"
-import { Pencil, Trash2, Search, Check, MapPin } from "lucide-react"
+import { Pencil, Trash2, Search, Check, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import DialogComponent from "@/components/shared/DialogComponent"
+import EditMonitorFormModal from "../components/EditMonitorFormModal"
 
-const initialMonitors = [
+type Monitor = {
+  id: string
+  name: string
+  course: string
+  mat: string
+  class: string
+  email: string
+}
+
+const initialMonitors: Monitor[] = [
   { id: "1", name: "Renata Gonçalves", course: "Ciência da Computação", mat: "2422333", class: "Matemática Discreta", email: "renata@edu.unifor.br" },
   { id: "2", name: "Laura Silva", course: "Engenharia da Computação", mat: "2422434", class: "Construção e Análise de Algoritmos", email: "laura@edu.unifor.br" },
   { id: "3", name: "Maurício Mendes", course: "Arquitetura e Urbanismo", mat: "2422443", class: "Desenho Técnico", email: "mauricio@edu.unifor.br" },
@@ -17,11 +28,32 @@ const availableClasses = [
 ]
 
 export function AdminMonitorsPage() {
-  const [monitors, setMonitors] = React.useState(initialMonitors)
-  
+  const [monitors, setMonitors] = React.useState<Monitor[]>(initialMonitors)
+
   const [classInput, setClassInput] = React.useState("")
   const [matInput, setMatInput] = React.useState("")
   const [showErrors, setShowErrors] = React.useState(false)
+
+  const [editing, setEditing] = React.useState<Monitor | null>(null)
+  const [deleting, setDeleting] = React.useState<Monitor | null>(null)
+
+  const classOptions = availableClasses.map((cls) => ({ value: cls, label: cls }))
+
+  const handleUpdateMonitor = (values: { class: string; email: string }) => {
+    if (!editing) return
+    setMonitors((prev) =>
+      prev.map((m) =>
+        m.id === editing.id ? { ...m, class: values.class, email: values.email } : m
+      )
+    )
+    setEditing(null)
+  }
+
+  const handleConfirmDelete = () => {
+    if (!deleting) return
+    setMonitors((prev) => prev.filter((m) => m.id !== deleting.id))
+    setDeleting(null)
+  }
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
@@ -145,10 +177,20 @@ export function AdminMonitorsPage() {
 
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-2">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-[#0047BA] hover:bg-blue-50">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setEditing(mon)}
+                        className="h-8 w-8 text-slate-400 hover:text-[#0047BA] hover:bg-blue-50"
+                      >
                         <Pencil className="size-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setDeleting(mon)}
+                        className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50"
+                      >
                         <Trash2 className="size-4" />
                       </Button>
                     </div>
@@ -159,6 +201,35 @@ export function AdminMonitorsPage() {
           </table>
         </Card>
       </div>
+
+      <EditMonitorFormModal
+        open={editing !== null}
+        onOpenChange={(open) => !open && setEditing(null)}
+        monitor={editing}
+        classes={classOptions}
+        onSubmit={handleUpdateMonitor}
+      />
+
+      <DialogComponent
+        title="Remover monitor"
+        description={
+          deleting
+            ? `Tem certeza que deseja remover "${deleting.name}" da monitoria? Esta ação não pode ser desfeita.`
+            : ""
+        }
+        isOpen={deleting !== null}
+        onOpenChange={(open) => !open && setDeleting(null)}
+        icon={<AlertTriangle />}
+      >
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={() => setDeleting(null)}>
+            Cancelar
+          </Button>
+          <Button variant="destructive" onClick={handleConfirmDelete}>
+            Remover
+          </Button>
+        </div>
+      </DialogComponent>
     </div>
   )
 }

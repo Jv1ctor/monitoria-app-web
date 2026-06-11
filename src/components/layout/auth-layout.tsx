@@ -20,12 +20,11 @@ const ROLE_NAVS: Record<Role, NavItem[]> = {
     { label: "Fórum", path: paths.monitorForum },
   ],
   admin: [
-    { label: "Dashboard", path: paths.admin },
-    { label: "Disciplinas", path: "#" },
-    { label: "Turmas", path: paths.home },
-    { label: "Alunos", path: "/students" },
-    { label: "Monitores", path: "#" },
-    { label: "Vincular", path: "#" },
+    { label: "Início", path: paths.admin },
+    { label: "Disciplinas", path: paths.adminSubjects },
+    { label: "Turmas", path: paths.adminClasses },
+    { label: "Gerenciar Turmas", path: paths.adminStudentsClass },
+    { label: "Monitores", path: paths.adminMonitors },
   ],
 }
 
