@@ -7,6 +7,12 @@ type FrequencysResponseDto = {
   createdAt: string;
   unboundAt?: string;
   enrolled: boolean;
+  student?: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    registration: string;
+  };
   lesson?: {
     id: number;
     modality: string;

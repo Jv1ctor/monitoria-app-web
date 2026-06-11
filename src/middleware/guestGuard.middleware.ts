@@ -2,7 +2,7 @@ import { getRoleFromToken, getToken } from "@/lib/jwt"
 import { paths } from "@/routes/paths"
 import { redirect } from "react-router"
 
-function homeByRole(role: string): string {
+export function homeByRole(role: string): string {
   if (role === "student") return paths.student
   if (role === "monitor") return paths.monitor
   if (role === "admin") return paths.admin

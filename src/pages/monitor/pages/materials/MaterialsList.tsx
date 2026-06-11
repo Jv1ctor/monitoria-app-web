@@ -1,159 +1,332 @@
 import * as React from "react"
-import { FileText, Plus, Pencil, Trash2 } from "lucide-react"
+import { useLoaderData, useRevalidator } from "react-router"
+import { Eye, Download, FileText, Plus, Pencil, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Field,
+  FieldLabel,
+  FieldError,
+  FieldGroup,
+} from "@/components/ui/field"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
-const initialMaterials = [
-  { id: "1", title: "Apostila de Limites", course: "Cálculo I", type: "PDF", date: "12/05/2026" },
-  { id: "2", title: "Lista de Exercícios — Derivadas", course: "Cálculo I", type: "DOCX", date: "14/05/2026" },
-  { id: "3", title: "Slides — Integral por partes", course: "Cálculo I", type: "PDF", date: "15/05/2026" }
-]
+import { SectionHeading } from "@/components/shared/SectionHeading"
+import { EmptyState } from "@/components/shared/empty-state"
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 
-const COURSES = [
-  { value: "Cálculo I", label: "Cálculo I" },
-  { value: "Física II", label: "Física II" },
-  { value: "Álgebra Linear", label: "Álgebra Linear" }
-]
+import {
+  createDocumentUploadUrl,
+  updateDocument,
+  deleteDocument,
+  getSignedDownloadAndPreview,
+} from "@/services/document.service"
+import { ApiError } from "@/lib/handle-request"
+import { mapFieldErrors, mapApiFieldErrors } from "@/lib/zod-field-errors"
+import {
+  createDocumentSchema,
+  updateDocumentSchema,
+} from "@/schemas/monitor/document.schema"
+import { formatData } from "@/lib/data-format.lib"
+import type { MonitorMaterialsLoaderResult } from "@/loaders/monitor-materials.loader"
 
-const ALLOWED_EXTENSIONS = [".pdf", ".docx", ".pptx"]
+type CreateForm = {
+  class_id: string
+  description: string
+  file: File | null
+}
+
+type EditForm = {
+  description: string
+}
 
 export function MaterialsListPage() {
-  const [materials, setMaterials] = React.useState(initialMaterials)
+  const { classes, documentsByClass } =
+    useLoaderData() as MonitorMaterialsLoaderResult
+  const revalidator = useRevalidator()
 
-  const [formErrors, setFormErrors] = React.useState<Record<string, string>>({})
-
-  //estatdos p modal de criacao
   const [isCreateOpen, setIsCreateOpen] = React.useState(false)
-  const [createTitle, setCreateTitle] = React.useState("")
-  const [createCourse, setCreateCourse] = React.useState("")
-  const fileRef = React.useRef<HTMLInputElement>(null)
-
-  //estados p modal de edicao
   const [isEditOpen, setIsEditOpen] = React.useState(false)
-  const [editingId, setEditingId] = React.useState<string | null>(null)
-  const [editTitle, setEditTitle] = React.useState("")
-  const [editCourse, setEditCourse] = React.useState("")
+  const [editingId, setEditingId] = React.useState<number | null>(null)
+  const [createForm, setCreateForm] = React.useState<CreateForm>({
+    class_id: "",
+    description: "",
+    file: null,
+  })
+  const [editForm, setEditForm] = React.useState<EditForm>({
+    description: "",
+  })
+  const [formErrors, setFormErrors] = React.useState<Record<string, string>>({})
+  const [submitting, setSubmitting] = React.useState(false)
+  const [loadingKey, setLoadingKey] = React.useState<string | null>(null)
+  const [deleteOpen, setDeleteOpen] = React.useState(false)
+  const [deleteTargetId, setDeleteTargetId] = React.useState<number | null>(
+    null,
+  )
 
-  const handleDelete = (id: string) => {
-    setMaterials((current) => current.filter((item) => item.id !== id))
-    toast.success("Material excluído com sucesso!")
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
+
+  const onOpenCreate = (open: boolean) => {
+    setIsCreateOpen(open)
+    if (!open) {
+      setCreateForm({ class_id: "", description: "", file: null })
+      setFormErrors({})
+      if (fileInputRef.current) fileInputRef.current.value = ""
+    }
   }
 
-  const handleCreateSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const errors: Record<string, string> = {}
-
-    if (!createTitle || createTitle.trim() === "") errors.title = "O título é obrigatório."
-    if (!createCourse) errors.course = "Selecione uma disciplina."
-
-    const selectedFile = fileRef.current?.files?.[0]
-    let autoDetectedType = ""
-
-    if (!selectedFile) {
-      errors.file = "Anexe o arquivo do material."
-    } else {
-      const fileName = selectedFile.name.toLowerCase()
-      const isValidExtension = ALLOWED_EXTENSIONS.some(ext => fileName.endsWith(ext))
-      
-      if (!isValidExtension) {
-        errors.file = "Formato inválido. Apenas .pdf, .docx ou .pptx são aceitos."
-      } else {
-        if (fileName.endsWith(".pdf")) autoDetectedType = "PDF"
-        else if (fileName.endsWith(".docx")) autoDetectedType = "DOCX"
-        else if (fileName.endsWith(".pptx")) autoDetectedType = "PPTX"
-      }
+  const onOpenEdit = (open: boolean) => {
+    setIsEditOpen(open)
+    if (!open) {
+      setEditingId(null)
+      setEditForm({ description: "" })
+      setFormErrors({})
     }
+  }
 
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors)
+  const handleCreate = async () => {
+    const parsed = createDocumentSchema.safeParse({
+      class_id: createForm.class_id,
+      description: createForm.description || undefined,
+      file: createForm.file,
+    })
+    if (!parsed.success) {
+      setFormErrors(mapFieldErrors(parsed.error))
       return
     }
-
-    setFormErrors({}) 
-
-    const newMaterial = {
-      id: Math.random().toString(),
-      title: createTitle,
-      course: createCourse,
-      type: autoDetectedType,
-      date: "Agora", 
+    setFormErrors({})
+    setSubmitting(true)
+    try {
+      const { upload_url } = await createDocumentUploadUrl({
+        class_id: parsed.data.class_id,
+        file_name: parsed.data.file.name,
+        contentType: parsed.data.file.type,
+        size: parsed.data.file.size,
+        description: parsed.data.description ?? null,
+      })
+      const put = await fetch(upload_url, {
+        method: "PUT",
+        body: parsed.data.file,
+        headers: { "Content-Type": parsed.data.file.type },
+      })
+      if (!put.ok) {
+        throw new Error(`Upload falhou (HTTP ${put.status})`)
+      }
+      toast.success("Material enviado!")
+      onOpenCreate(false)
+      revalidator.revalidate()
+    } catch (e) {
+      if (e instanceof ApiError) {
+        if (e.fieldErrors.length) {
+          setFormErrors(mapApiFieldErrors(e.fieldErrors))
+        } else {
+          toast.error(e.message)
+        }
+      } else if (e instanceof Error) {
+        toast.error(e.message)
+      } else {
+        toast.error("Erro no upload")
+      }
+    } finally {
+      setSubmitting(false)
     }
-
-    setMaterials([newMaterial, ...materials])
-    toast.success("Material publicado!")
-    setIsCreateOpen(false)
-    
-    setCreateTitle("")
-    setCreateCourse("")
-    if (fileRef.current) fileRef.current.value = ""
   }
 
-  const openEditModal = (material: any) => {
-    setFormErrors({}) 
-    setEditingId(material.id)
-    setEditTitle(material.title)
-    setEditCourse(material.course)
+  const openEdit = (id: number, description: string | null) => {
+    setEditingId(id)
+    setEditForm({ description: description ?? "" })
+    setFormErrors({})
     setIsEditOpen(true)
   }
 
-  const handleEditSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    const errors: Record<string, string> = {}
-
-    if (!editTitle || editTitle.trim() === "") errors.editTitle = "O título não pode ficar vazio."
-    if (!editCourse) errors.editCourse = "Selecione uma disciplina."
-
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors)
+  const handleEdit = async () => {
+    if (editingId === null) return
+    const parsed = updateDocumentSchema.safeParse(editForm)
+    if (!parsed.success) {
+      setFormErrors(mapFieldErrors(parsed.error))
       return
     }
-
     setFormErrors({})
-
-    const updatedMaterials = []
-    for (let i = 0; i < materials.length; i++) {
-      if (materials[i].id === editingId) {
-        updatedMaterials.push({
-          ...materials[i],
-          title: editTitle,
-          course: editCourse,
-        })
+    setSubmitting(true)
+    try {
+      await updateDocument(editingId, {
+        description: parsed.data.description ?? null,
+      })
+      toast.success("Material atualizado!")
+      onOpenEdit(false)
+      revalidator.revalidate()
+    } catch (e) {
+      if (e instanceof ApiError) {
+        if (e.fieldErrors.length) {
+          setFormErrors(mapApiFieldErrors(e.fieldErrors))
+        } else {
+          toast.error(e.message)
+        }
       } else {
-        updatedMaterials.push(materials[i])
+        toast.error("Erro ao atualizar")
       }
+    } finally {
+      setSubmitting(false)
     }
-
-    setMaterials(updatedMaterials)
-    toast.success("Material atualizado!")
-    setIsEditOpen(false)
   }
 
-  const onOpenCreateChange = (open: boolean) => {
-    setIsCreateOpen(open)
-    if (!open) setFormErrors({})
+  const handleDelete = async () => {
+    if (deleteTargetId === null) return
+    try {
+      await deleteDocument(deleteTargetId)
+      toast.success("Material excluído!")
+      revalidator.revalidate()
+    } catch (e) {
+      const msg = e instanceof ApiError ? e.message : "Erro ao excluir"
+      toast.error(msg)
+    } finally {
+      setDeleteOpen(false)
+    }
   }
 
-  const onOpenEditChange = (open: boolean) => {
-    setIsEditOpen(open)
-    if (!open) setFormErrors({})
+  const renderTable = (classId: number) => {
+    const docs = documentsByClass[classId] ?? []
+    if (docs.length === 0) {
+      return (
+        <TableRow>
+          <TableCell
+            colSpan={4}
+            className="h-16 text-center text-muted-foreground"
+          >
+            Nenhum material nesta turma.
+          </TableCell>
+        </TableRow>
+      )
+    }
+    return docs.map((d) => (
+      <TableRow key={d.id}>
+        <TableCell className="font-medium">
+          <div className="flex items-center gap-3">
+            <div className="size-8 rounded bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <FileText className="size-4" />
+            </div>
+            <span className="text-sm font-bold">
+              {d.description || d.filename}
+            </span>
+          </div>
+        </TableCell>
+        <TableCell>
+          <span className="text-[10px] font-bold bg-muted text-muted-foreground px-2 py-1 rounded uppercase">
+            {d.mime_type.split("/").pop()}
+          </span>
+        </TableCell>
+        <TableCell className="text-sm text-muted-foreground">
+          {formatData(d.createdAt)}
+        </TableCell>
+        <TableCell className="text-right pr-6">
+          <div className="flex items-center justify-end gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              className="size-8"
+              disabled={loadingKey === d.key}
+              onClick={async () => {
+                setLoadingKey(d.key)
+                try {
+                  const { preview_url } = await getSignedDownloadAndPreview(
+                    d.key,
+                  )
+                  window.open(preview_url, "_blank")
+                } catch (e) {
+                  toast.error("Erro ao gerar visualização")
+                  console.error(e)
+                } finally {
+                  setLoadingKey(null)
+                }
+              }}
+              title="Visualizar"
+            >
+              <Eye className="size-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="size-8"
+              disabled={loadingKey === d.key}
+              onClick={async () => {
+                setLoadingKey(d.key)
+                try {
+                  const { download_url } = await getSignedDownloadAndPreview(
+                    d.key,
+                  )
+                  window.open(download_url, "_blank")
+                } catch (e) {
+                  toast.error("Erro ao baixar")
+                  console.error(e)
+                } finally {
+                  setLoadingKey(null)
+                }
+              }}
+              title="Baixar"
+            >
+              <Download className="size-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="size-8"
+              onClick={() => openEdit(d.id, d.description)}
+              title="Editar descrição"
+            >
+              <Pencil className="size-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="size-8 text-muted-foreground hover:text-destructive"
+              onClick={() => {
+                setDeleteTargetId(d.id)
+                setDeleteOpen(true)
+              }}
+              title="Excluir"
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          </div>
+        </TableCell>
+      </TableRow>
+    ))
   }
 
   return (
     <div className="max-w-6xl mx-auto py-8 px-6 w-full">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Materiais</h1>
-          <p className="text-sm text-muted-foreground mt-1">Publique apostilas, listas e slides.</p>
+          <h1 className="text-3xl font-bold tracking-tight">Materiais</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Publique apostilas, listas e slides por turma.
+          </p>
         </div>
-
-        <Dialog open={isCreateOpen} onOpenChange={onOpenCreateChange}>
+        <Dialog open={isCreateOpen} onOpenChange={onOpenCreate}>
           <DialogTrigger asChild>
             <Button className="bg-[#0047BA] hover:bg-[#003a99] text-white">
               <Plus className="mr-2 size-4" />
@@ -163,48 +336,96 @@ export function MaterialsListPage() {
           <DialogContent className="sm:max-w-md">
             <DialogHeader className="mb-2">
               <DialogTitle>Publicar Material</DialogTitle>
-              <DialogDescription>Preencha os dados e selecione o arquivo (.pdf, .docx, .pptx).</DialogDescription>
+              <DialogDescription>
+                Selecione a turma, anexe o arquivo (.pdf, .docx, .pptx, máx
+                20MB).
+              </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleCreateSubmit}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                handleCreate()
+              }}
+            >
               <FieldGroup className="gap-5">
                 <Field>
-                  <FieldLabel>Título do Material</FieldLabel>
-                  <Input 
-                    value={createTitle} 
-                    onChange={(e) => setCreateTitle(e.target.value)} 
-                    placeholder="Ex: Lista de Exercícios 01" 
-                    className={formErrors.title ? "border-destructive focus-visible:ring-destructive" : ""}
-                  />
-                  {formErrors.title && <FieldError errors={[{ message: formErrors.title }]} />}
-                </Field>
-
-                <Field>
-                  <FieldLabel>Disciplina</FieldLabel>
-                  <Select onValueChange={setCreateCourse} value={createCourse}>
-                    <SelectTrigger className={formErrors.course ? "border-destructive" : ""}>
+                  <FieldLabel>Turma</FieldLabel>
+                  <Select
+                    value={createForm.class_id}
+                    onValueChange={(v) =>
+                      setCreateForm({ ...createForm, class_id: v })
+                    }
+                  >
+                    <SelectTrigger
+                      className={
+                        formErrors.class_id ? "border-destructive" : ""
+                      }
+                    >
                       <SelectValue placeholder="Selecione..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {COURSES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
+                      {classes.map((c) => (
+                        <SelectItem key={c.id} value={String(c.id)}>
+                          {c.code}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
-                  {formErrors.course && <FieldError errors={[{ message: formErrors.course }]} />}
+                  {formErrors.class_id && (
+                    <FieldError errors={[{ message: formErrors.class_id }]} />
+                  )}
                 </Field>
-
+                <Field>
+                  <FieldLabel>Descrição (opcional)</FieldLabel>
+                  <Input
+                    value={createForm.description}
+                    onChange={(e) =>
+                      setCreateForm({
+                        ...createForm,
+                        description: e.target.value,
+                      })
+                    }
+                    placeholder="Ex: Lista 01 — Limites"
+                  />
+                  {formErrors.description && (
+                    <FieldError
+                      errors={[{ message: formErrors.description }]}
+                    />
+                  )}
+                </Field>
                 <Field>
                   <FieldLabel>Arquivo</FieldLabel>
-                  <Input 
-                    type="file" 
-                    ref={fileRef}
-                    accept=".pdf,.docx,.pptx" 
-                    className={`cursor-pointer ${formErrors.file ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                  <Input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={(e) =>
+                      setCreateForm({
+                        ...createForm,
+                        file: e.target.files?.[0] ?? null,
+                      })
+                    }
+                    className={`cursor-pointer ${formErrors.file ? "border-destructive" : ""}`}
                   />
-                  {formErrors.file && <FieldError errors={[{ message: formErrors.file }]} />}
+                  {formErrors.file && (
+                    <FieldError errors={[{ message: formErrors.file }]} />
+                  )}
                 </Field>
-
                 <div className="flex justify-end gap-3 mt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>Cancelar</Button>
-                  <Button type="submit" className="bg-[#0047BA] hover:bg-[#003a99]">Salvar</Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => onOpenCreate(false)}
+                    disabled={submitting}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="bg-[#0047BA] hover:bg-[#003a99]"
+                    disabled={submitting}
+                  >
+                    {submitting ? "Enviando..." : "Salvar"}
+                  </Button>
                 </div>
               </FieldGroup>
             </form>
@@ -212,87 +433,86 @@ export function MaterialsListPage() {
         </Dialog>
       </div>
 
-      <Table>
-        <TableHeader className="bg-muted/30">
-          <TableRow>
-            <TableHead className="w-[300px] text-xs font-bold text-muted-foreground uppercase">Título</TableHead>
-            <TableHead className="text-xs font-bold text-muted-foreground uppercase">Disciplina</TableHead>
-            <TableHead className="text-xs font-bold text-muted-foreground uppercase">Tipo</TableHead>
-            <TableHead className="text-xs font-bold text-muted-foreground uppercase">Publicado</TableHead>
-            <TableHead className="text-right text-xs font-bold text-muted-foreground uppercase pr-6">Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {materials.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">Nenhum material publicado.</TableCell>
-            </TableRow>
-          ) : (
-            materials.map((material) => (
-              <TableRow key={material.id}>
-                <TableCell className="font-medium">
-                  <div className="flex items-center gap-3">
-                    <div className="size-8 rounded bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                      <FileText className="size-4" />
-                    </div>
-                    <span className="text-sm font-bold text-foreground">{material.title}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-sm text-muted-foreground">{material.course}</TableCell>
-                <TableCell>
-                  <span className="text-[10px] font-bold bg-muted text-muted-foreground px-2 py-1 rounded uppercase">
-                    {material.type}
-                  </span>
-                </TableCell>
-                <TableCell className="text-sm text-muted-foreground">{material.date}</TableCell>
-                <TableCell className="text-right pr-6">
-                  <div className="flex items-center justify-end gap-2">
-                    <Button variant="outline" size="icon" className="size-8 text-muted-foreground hover:text-foreground" onClick={() => openEditModal(material)} title="Editar">
-                      <Pencil className="size-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:border-destructive/20" onClick={() => handleDelete(material.id)} title="Excluir">
-                      <Trash2 className="size-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+      {classes.length === 0 ? (
+        <EmptyState
+          title="Nenhuma turma vinculada"
+          description="Você ainda não tem turmas atribuídas."
+        />
+      ) : (
+        <div className="space-y-8">
+          {classes.map((c) => (
+            <section key={c.id}>
+              <SectionHeading
+                title={c.code}
+                meta={`${(documentsByClass[c.id] ?? []).length} material(is)`}
+              />
+              <Table>
+                <TableHeader className="bg-muted/30">
+                  <TableRow>
+                    <TableHead>Descrição / Arquivo</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Publicado</TableHead>
+                    <TableHead className="text-right pr-6">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>{renderTable(c.id)}</TableBody>
+              </Table>
+            </section>
+          ))}
+        </div>
+      )}
 
-      <Dialog open={isEditOpen} onOpenChange={onOpenEditChange}>
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title="Excluir este material?"
+        description="Esta ação não pode ser desfeita."
+        onConfirm={handleDelete}
+      />
+
+      <Dialog open={isEditOpen} onOpenChange={onOpenEdit}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader className="mb-2">
             <DialogTitle>Editar Material</DialogTitle>
-            <DialogDescription>Altere as informações do material selecionado.</DialogDescription>
+            <DialogDescription>
+              Altere a descrição do material selecionado.
+            </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleEditSubmit}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              handleEdit()
+            }}
+          >
             <FieldGroup className="gap-5">
               <Field>
-                <FieldLabel>Título do Material</FieldLabel>
-                <Input 
-                  value={editTitle} 
-                  onChange={(e) => setEditTitle(e.target.value)} 
-                  className={formErrors.editTitle ? "border-destructive focus-visible:ring-destructive" : ""}
+                <FieldLabel>Descrição</FieldLabel>
+                <Input
+                  value={editForm.description}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, description: e.target.value })
+                  }
                 />
-                {formErrors.editTitle && <FieldError errors={[{ message: formErrors.editTitle }]} />}
-              </Field>
-              <Field>
-                <FieldLabel>Disciplina</FieldLabel>
-                <Select onValueChange={setEditCourse} value={editCourse}>
-                  <SelectTrigger className={formErrors.editCourse ? "border-destructive" : ""}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {COURSES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-                {formErrors.editCourse && <FieldError errors={[{ message: formErrors.editCourse }]} />}
+                {formErrors.description && (
+                  <FieldError errors={[{ message: formErrors.description }]} />
+                )}
               </Field>
               <div className="flex justify-end gap-3 mt-4">
-                <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>Cancelar</Button>
-                <Button type="submit" className="bg-[#0047BA] hover:bg-[#003a99]">Atualizar</Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenEdit(false)}
+                  disabled={submitting}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-[#0047BA] hover:bg-[#003a99]"
+                  disabled={submitting}
+                >
+                  {submitting ? "Salvando..." : "Atualizar"}
+                </Button>
               </div>
             </FieldGroup>
           </form>
