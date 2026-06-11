@@ -1,8 +1,8 @@
-import { handleRequest } from "@/lib/handle-request";
+import { handleRequest, handleArrayRequest } from "@/lib/handle-request";
 import type { SubjectResponseDto } from "@/types/subject.type";
 
 async function getSubjects(): Promise<SubjectResponseDto[]> {
-  return handleRequest<SubjectResponseDto[]>({
+  return handleArrayRequest<SubjectResponseDto>({
     method: "GET",
     url: "/subject",
   });

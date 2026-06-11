@@ -1,8 +1,8 @@
-import { handleRequest } from "@/lib/handle-request";
+import { handleRequest, handleArrayRequest } from "@/lib/handle-request";
 import type { ClassResponseDto } from "@/types/class.type";
 
 async function getClasses(): Promise<ClassResponseDto[]> {
-  return handleRequest<ClassResponseDto[]>({
+  return handleArrayRequest<ClassResponseDto>({
     method: "GET",
     url: "/class",
   });

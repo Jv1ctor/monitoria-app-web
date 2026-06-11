@@ -54,5 +54,43 @@ async function handleRequest<T>(config: AxiosRequestConfig): Promise<T> {
   }
 }
 
-export { handleRequest, ApiError };
+/**
+ * Variante de handleRequest que garante que a resposta é um array.
+ * Se a API retornar null, undefined ou um objeto não-array, retorna [].
+ * Isso previne o erro "n.map is not a function" em produção.
+ */
+async function handleArrayRequest<T>(config: AxiosRequestConfig): Promise<T[]> {
+  try {
+    const response = await httpClient.request<T[]>(config);
+    if (Array.isArray(response.data)) {
+      return response.data;
+    }
+    console.warn(
+      `[handleArrayRequest] Resposta de ${config.url} não é um array, retornando []:`,
+      typeof response.data,
+    );
+    return [];
+  } catch (error) {
+    const axiosError = error as AxiosError<ApiErrorData>;
+    const data = axiosError.response?.data;
+
+    if (data) {
+      const fieldErrors: FieldError[] =
+        data.errors?.map((err) => {
+          const constraints = err.constraints ?? [];
+          return {
+            field: err.field,
+            message: constraints.join(" "),
+            constraints,
+          };
+        }) ?? [];
+
+      throw new ApiError(data.code_error, data.message, fieldErrors);
+    }
+
+    throw new ApiError("UNKNOWN", axiosError.message || "Unknown error");
+  }
+}
+
+export { handleRequest, handleArrayRequest, ApiError };
 export type { FieldError };

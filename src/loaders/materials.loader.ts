@@ -21,9 +21,9 @@ export const materialsLoader = async ({
   }
 
   const [documents, classInfo, myRatings] = await Promise.all([
-    getDocumentsByClass(classId),
+    getDocumentsByClass(classId).catch(() => [] as DocumentResponseDto[]),
     getClassById(classId),
-    getMyRatings(),
+    getMyRatings().catch(() => [] as RatingResponseDto[]),
   ]);
 
   const existingRating = myRatings.find(

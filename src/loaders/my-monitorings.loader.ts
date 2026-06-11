@@ -6,6 +6,6 @@ export type MyMonitoringsLoaderResult = {
 };
 
 export const myMonitoringsLoader = async (): Promise<MyMonitoringsLoaderResult> => {
-  const lessons = await getEnrolledLessons();
+  const lessons = await getEnrolledLessons().catch(() => [] as LessonResponseDto[]);
   return { lessons };
 };

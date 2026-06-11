@@ -21,8 +21,8 @@ export const studentDashboardLoader = async (): Promise<StudentDashboardLoaderRe
   const me = await getMe();
 
   const [enrolledLessons, frequencies] = await Promise.all([
-    getEnrolledLessons(),
-    getFrequenciesByStudent(me.id),
+    getEnrolledLessons().catch(() => [] as LessonResponseDto[]),
+    getFrequenciesByStudent(me.id).catch(() => [] as FrequencysResponseDto[]),
   ]);
 
   console.log(frequencies)

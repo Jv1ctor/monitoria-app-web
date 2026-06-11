@@ -10,6 +10,6 @@ export type StudentAttendanceLoaderResult = {
 
 export const studentAttendanceLoader = async (): Promise<StudentAttendanceLoaderResult> => {
   const me = await getMe();
-  const frequencies = await getFrequenciesByStudent(me.id);
+  const frequencies = await getFrequenciesByStudent(me.id).catch(() => [] as FrequencysResponseDto[]);
   return { me, frequencies };
 };

@@ -1,8 +1,8 @@
-import { handleRequest } from "@/lib/handle-request";
+import { handleRequest, handleArrayRequest } from "@/lib/handle-request";
 import type { LessonResponseDto } from "@/types/lesson.type";
 
 async function getLessonsByClass(classId: number): Promise<LessonResponseDto[]> {
-  return handleRequest<LessonResponseDto[]>({
+  return handleArrayRequest<LessonResponseDto>({
     method: "GET",
     url: "/lesson/by-class",
     params: { class_id: classId },
@@ -31,7 +31,7 @@ async function unenrollLesson(id: number): Promise<void> {
 }
 
 async function getEnrolledLessons(): Promise<LessonResponseDto[]> {
-  return handleRequest<LessonResponseDto[]>({
+  return handleArrayRequest<LessonResponseDto>({
     method: "GET",
     url: "/lesson/enrolled",
   });

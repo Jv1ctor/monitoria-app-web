@@ -1,4 +1,4 @@
-import { handleRequest } from "@/lib/handle-request";
+import { handleRequest, handleArrayRequest } from "@/lib/handle-request";
 import type { RatingResponseDto } from "@/types/rating.type";
 
 type CreateRatingPayload = {
@@ -15,7 +15,7 @@ async function createRating(payload: CreateRatingPayload): Promise<RatingRespons
 }
 
 async function getMyRatings(): Promise<RatingResponseDto[]> {
-  return handleRequest<RatingResponseDto[]>({
+  return handleArrayRequest<RatingResponseDto>({
     method: "GET",
     url: "/rating/me/ratings",
   });

@@ -13,7 +13,7 @@ export type AvailableMonitoringsLoaderResult = {
 };
 
 export const availableMonitoringsLoader = async (): Promise<AvailableMonitoringsLoaderResult> => {
-  const classes = await getClasses();
+  const classes = await getClasses().catch(() => []);
 
   const monitorings: AvailableMonitoringItem[] = classes.map((cls) => ({
     id: cls.id,

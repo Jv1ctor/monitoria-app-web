@@ -1,4 +1,4 @@
-import { handleRequest } from "@/lib/handle-request";
+import { handleArrayRequest } from "@/lib/handle-request";
 
 type Major = {
   id: string;
@@ -7,7 +7,7 @@ type Major = {
 };
 
 async function getMajors(): Promise<Major[]> {
-  return handleRequest<Major[]>({
+  return handleArrayRequest<Major>({
     method: "GET",
     url: "/major",
   });

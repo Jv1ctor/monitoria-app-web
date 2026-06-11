@@ -17,8 +17,8 @@ export const specificMonitoringLoader = async ({
   }
 
   const [lessons, enrolled] = await Promise.all([
-    getLessonsByClass(classId),
-    getEnrolledLessons(),
+    getLessonsByClass(classId).catch(() => [] as LessonResponseDto[]),
+    getEnrolledLessons().catch(() => [] as LessonResponseDto[]),
   ]);
 
   const enrolledLessonIds = enrolled.map((l) => l.id);

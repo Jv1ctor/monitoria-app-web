@@ -1,10 +1,10 @@
-import { handleRequest } from "@/lib/handle-request";
+import { handleRequest, handleArrayRequest } from "@/lib/handle-request";
 import type { FrequencysResponseDto } from "@/types/frequencys.type";
 
 async function getFrequenciesByStudent(
   studentId: number,
 ): Promise<FrequencysResponseDto[]> {
-  return handleRequest<FrequencysResponseDto[]>({
+  return handleArrayRequest<FrequencysResponseDto>({
     method: "GET",
     url: "/frequencys/by-student",
     params: { student_id: studentId },
@@ -14,7 +14,7 @@ async function getFrequenciesByStudent(
 async function getFrequenciesByLesson(
   lessonId: number,
 ): Promise<FrequencysResponseDto[]> {
-  return handleRequest<FrequencysResponseDto[]>({
+  return handleArrayRequest<FrequencysResponseDto>({
     method: "GET",
     url: "/frequencys/by-lesson",
     params: { lesson_id: lessonId },
@@ -24,7 +24,7 @@ async function getFrequenciesByLesson(
 async function getFrequenciesByClass(
   classId: number,
 ): Promise<FrequencysResponseDto[]> {
-  return handleRequest<FrequencysResponseDto[]>({
+  return handleArrayRequest<FrequencysResponseDto>({
     method: "GET",
     url: "/frequencys/by-class",
     params: { class_id: classId },

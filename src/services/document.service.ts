@@ -1,10 +1,10 @@
-import { handleRequest } from "@/lib/handle-request";
+import { handleRequest, handleArrayRequest } from "@/lib/handle-request";
 import type { DocumentResponseDto } from "@/types/document.type";
 
 async function getDocumentsByClass(
   classId: number,
 ): Promise<DocumentResponseDto[]> {
-  return handleRequest<DocumentResponseDto[]>({
+  return handleArrayRequest<DocumentResponseDto>({
     method: "GET",
     url: "/document",
     params: { class_id: classId },

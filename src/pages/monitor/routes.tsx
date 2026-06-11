@@ -39,9 +39,11 @@ export const monitorRoutes = [
   {
     path: "forum",
     element: <ForumListPage />,
+    errorElement: <RouteErrorFallback />,
   },
   {
     path: "forum/:id",
     element: <ForumTopicPage />,
+    errorElement: <RouteErrorFallback />,
   },
 ]

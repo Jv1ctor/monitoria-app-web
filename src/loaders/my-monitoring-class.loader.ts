@@ -18,7 +18,7 @@ export const myMonitoringClassLoader = async ({
     throw new Error("ID da turma inválido.");
   }
 
-  const enrolledLessons = await getEnrolledLessons();
+  const enrolledLessons = await getEnrolledLessons().catch(() => [] as LessonResponseDto[]);
   const lessons = enrolledLessons.filter((l) => l.class_id === classId);
 
   const firstLesson = lessons[0];

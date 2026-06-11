@@ -14,48 +14,62 @@ import { studentAttendanceLoader } from "@/loaders/student-attendance.loader"
 import { myMonitoringsLoader } from "@/loaders/my-monitorings.loader"
 import { myMonitoringClassLoader } from "@/loaders/my-monitoring-class.loader"
 import { studentDashboardLoader } from "@/loaders/student-dashboard.loader"
+import { RouteErrorFallback } from "@/components/shared/RouteErrorFallback"
 
 export const studentRoutes = [
-  { index: true, element: <WelcomeStudent />, loader: studentDashboardLoader },
+  {
+    index: true,
+    element: <WelcomeStudent />,
+    loader: studentDashboardLoader,
+    errorElement: <RouteErrorFallback />,
+  },
   {
     path: "monitoring",
     element: <AvailableMonitoringsPage />,
     loader: availableMonitoringsLoader,
+    errorElement: <RouteErrorFallback />,
   },
   {
     path: "monitoring/:id",
     element: <SpecificMonitoringPage />,
     loader: specificMonitoringLoader,
+    errorElement: <RouteErrorFallback />,
   },
 
   {
     path: "my-monitoring",
     element: <MyMonitorings />,
     loader: myMonitoringsLoader,
+    errorElement: <RouteErrorFallback />,
   },
 
   {
     path: "my-monitoring/:id",
     element: <MyMonitoringClassPage/>,
     loader: myMonitoringClassLoader,
+    errorElement: <RouteErrorFallback />,
   },
 
   {
     path: "materials/:id",
     element: <RatingTeachingAssistant />,
     loader: materialsLoader,
+    errorElement: <RouteErrorFallback />,
   },
   {
     path: "forum",
     element: <ForumListPage />,
+    errorElement: <RouteErrorFallback />,
   },
   {
     path: "forum/:id",
     element: <ForumTopicPage />,
+    errorElement: <RouteErrorFallback />,
   },
   {
     path: "frequencies",
     element: <StudentAttendancePage />,
     loader: studentAttendanceLoader,
+    errorElement: <RouteErrorFallback />,
   },
 ]
