@@ -1,26 +1,29 @@
 import { getClasses } from "@/services/class.service";
-import { getSubjects } from "@/services/subject.service";
-import type { AvailableMonitoringItem } from "@/types/student/AvailableMonitoringItem.type";
+
+export type AvailableMonitoringItem = {
+  id: number;
+  code: string;
+  subjectName: string;
+  monitorName: string;
+  monitorId: number;
+};
 
 export type AvailableMonitoringsLoaderResult = {
   monitorings: AvailableMonitoringItem[];
 };
 
 export const availableMonitoringsLoader = async (): Promise<AvailableMonitoringsLoaderResult> => {
-  const [classes, subjects] = await Promise.all([getClasses(), getSubjects()]);
+  const classes = await getClasses();
 
-  const subjectMap = new Map(subjects.map((s) => [s.id, s]));
-
-  const monitorings: AvailableMonitoringItem[] = classes.map((cls) => {
-    const subject = subjectMap.get(cls.subject_id);
-    return {
-      id: cls.id,
-      code: cls.code,
-      subjectName: subject?.name ?? "Desconhecida",
-      monitorId: cls.monitor_id,
-      monitorsCount: 1,
-    };
-  });
+  const monitorings: AvailableMonitoringItem[] = classes.map((cls) => ({
+    id: cls.id,
+    code: cls.code,
+    subjectName: cls.subject?.name ?? "Desconhecida",
+    monitorName: cls.monitor
+      ? `${cls.monitor.first_name} ${cls.monitor.last_name}`
+      : "Sem monitor",
+    monitorId: cls.monitor_id,
+  }));
 
   return { monitorings };
 };
