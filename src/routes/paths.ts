@@ -22,6 +22,7 @@ export const paths = {
   monitor: "/monitor",
   monitorMaterials: "/monitor/materials",
   monitorLessons: "/monitor/lessons",
+  monitorSchedule: "/monitor/schedule",
   monitorForum: "/monitor/forum",
 
   // admin
