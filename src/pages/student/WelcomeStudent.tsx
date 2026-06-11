@@ -20,7 +20,8 @@ import type { StudentDashboardLoaderResult } from "@/loaders/student-dashboard.l
 import { formatHora } from "@/lib/data-format.lib"
 
 function WelcomeStudent() {
-  const { me, enrolledLessons, stats } = useLoaderData<StudentDashboardLoaderResult>()
+  const { me, enrolledLessons, stats } =
+    useLoaderData<StudentDashboardLoaderResult>()
 
   const title = `Bem-vindo, ${me.first_name} ${me.last_name}`
 
@@ -36,13 +37,16 @@ function WelcomeStudent() {
       ? `${today.charAt(0).toUpperCase() + today.slice(1)} · Você tem ${stats.upcomingCount} monitoria(s) agendada(s).`
       : "Nenhuma monitoria agendada."
 
-  const uniqueDisciplines = new Set(enrolledLessons.map((l) => l.class?.subject?.name ?? l.class_id)).size
+  const uniqueDisciplines = new Set(
+    enrolledLessons.map((l) => l.class?.subject?.name ?? l.class_id),
+  ).size
 
   const nextLessonText =
     enrolledLessons.length > 0
       ? (() => {
           const sorted = [...enrolledLessons].sort(
-            (a, b) => new Date(a.date_time).getTime() - new Date(b.date_time).getTime()
+            (a, b) =>
+              new Date(a.date_time).getTime() - new Date(b.date_time).getTime(),
           )
           const first = sorted[0]
           return `${formatHora(first.date_time)} · ${first.class?.subject?.name ?? first.modality}`
@@ -55,10 +59,35 @@ function WelcomeStudent() {
         <WelcomeHeader title={title} subtitle={subtitle} />
 
         <StatGrid>
-          <StatCard icon={<CalendarCheck className="size-5" />} label="Frequência geral" value={`${stats.attendanceRate}%`} hint="Acima da meta de 75%" />
-          <StatCard icon={<Calendar className="size-5" />} label="Monitorias agendadas" value={`${stats.upcomingCount}`} hint="Nos próximos 7 dias" />
-          <StatCard icon={<BookOpen className="size-5" />} label="Disciplinas acompanhadas" value={`${uniqueDisciplines}`} hint="Neste semestre" />
-          <StatCard icon={<Clock className="size-5" />} label="Próxima monitoria" value={nextLessonText} hint={enrolledLessons.length > 0 ? (enrolledLessons[0].class?.subject?.name ?? enrolledLessons[0].modality) : "Sem monitorias"} />
+          <StatCard
+            icon={<CalendarCheck className="size-5" />}
+            label="Frequência geral"
+            value={`${stats.attendanceRate}%`}
+            hint="Acima da meta de 75%"
+          />
+          <StatCard
+            icon={<Calendar className="size-5" />}
+            label="Monitorias agendadas"
+            value={`${stats.upcomingCount}`}
+            hint="Nos próximos 7 dias"
+          />
+          <StatCard
+            icon={<BookOpen className="size-5" />}
+            label="Disciplinas acompanhadas"
+            value={`${uniqueDisciplines}`}
+            hint="Neste semestre"
+          />
+          <StatCard
+            icon={<Clock className="size-5" />}
+            label="Próxima monitoria"
+            value={nextLessonText}
+            hint={
+              enrolledLessons.length > 0
+                ? (enrolledLessons[0].class?.subject?.name ??
+                  enrolledLessons[0].modality)
+                : "Sem monitorias"
+            }
+          />
         </StatGrid>
 
         <section className="space-y-3">
@@ -68,9 +97,24 @@ function WelcomeStudent() {
         <section className="space-y-3">
           <SectionHeading title="Atalhos rápidos" />
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <ShortcutCard icon={<Search className="size-5" />} title="Buscar Disciplina" description="Encontre novas monitorias para acompanhar" to={paths.studentSearch} />
-            <ShortcutCard icon={<CalendarDays className="size-5" />} title="Minha Frequência" description="Acompanhe sua presença nas sessões" to={paths.studentFrequency} />
-            <ShortcutCard icon={<MessageSquare className="size-5" />} title="Fórum da Monitoria" description="Tire dúvidas e converse com a turma" to={paths.studentForum} />
+            <ShortcutCard
+              icon={<Search className="size-5" />}
+              title="Buscar Disciplina"
+              description="Encontre novas monitorias para acompanhar"
+              to={paths.studentMonitorings}
+            />
+            <ShortcutCard
+              icon={<CalendarDays className="size-5" />}
+              title="Minha Frequência"
+              description="Acompanhe sua presença nas sessões"
+              to={paths.studentFrequency}
+            />
+            <ShortcutCard
+              icon={<MessageSquare className="size-5" />}
+              title="Fórum da Monitoria"
+              description="Tire dúvidas e converse com a turma"
+              to={paths.studentForum}
+            />
           </div>
         </section>
       </div>
