@@ -24,7 +24,7 @@ export const monitorRoutes = [
     element: <ForumTopicPage />,
   },
   {
-    path: "/monitorSchedule",
+    path: "monitorSchedule",
     element: <MonitorSchedulePage />
   },
 ]

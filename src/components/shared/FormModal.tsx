@@ -1,38 +1,67 @@
-import type { ReactNode } from "react";
+import type { FormEvent, ReactNode } from "react";
 import { Button } from "../ui/button";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
 
 type FormModalProps = {
-    labelButton: string,
+    id: string,
+    open?: boolean,
+    onOpenChange?: (open: boolean) => void,
+    labelButton?: string,
+    labelIcon?: ReactNode
     title: string,
-    description?: string, 
-    handleSafeChanges: () => void,
+    description?: string,
+    handleSafeChanges: (event: FormEvent<HTMLFormElement>) => void,
     handleCloseModal: () => void,
     children: ReactNode
-    labelSaveModalButton: string
-    labelCloseModalButton: string
+    labelSaveModalButton?: string
+    labelCloseModalButton?: string
 }
 
-export default function FormModal(props: FormModalProps) {
+export default function FormModal({
+  id,
+  open,
+  onOpenChange,
+  labelButton = "Abrir",
+  labelIcon,
+  title,
+  description = "",
+  handleSafeChanges,
+  handleCloseModal,
+  children,
+  labelSaveModalButton = "Salvar",
+  labelCloseModalButton = "Cancelar"
+}: FormModalProps) {
+  const isControlled = open !== undefined;
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    handleSafeChanges(event);
+  };
+
   return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="outline">{props.labelButton}</Button>
-      </SheetTrigger>
+    <Sheet modal={true} open={open} onOpenChange={onOpenChange}>
+      {!isControlled && (
+        <SheetTrigger asChild>
+          <Button variant="outline">
+            {labelIcon}
+            {labelButton}
+          </Button>
+        </SheetTrigger>
+      )}
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>{props.title}</SheetTitle>
+          <SheetTitle>{title}</SheetTitle>
           <SheetDescription>
-            {props.description}
+            {description}
           </SheetDescription>
         </SheetHeader>
-        <div className="py-6 flex flex-col gap-4">
-          {props.children}
-        </div>
+        <form id={id} onSubmit={handleSubmit} className="flex flex-col gap-4 px-8">
+          {children}
+        </form>
         <SheetFooter>
-          <Button type="submit" onClick={props.handleSafeChanges}>{props.labelSaveModalButton}</Button>
+          <Button type="submit" form={id}>{labelSaveModalButton}</Button>
           <SheetClose asChild>
-            <Button variant="outline" onClick={props.handleCloseModal}>{props.labelCloseModalButton}</Button>
+            <Button type="button" variant="outline" onClick={handleCloseModal}>{labelCloseModalButton}</Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>

@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import EditScheduleFormModal, { type Schedule } from "./components/EditScheduleFormModal"
 
 const initialSchedules = [
   { 
@@ -48,13 +48,7 @@ export function MonitorSchedulePage() {
   const [capacity, setCapacity] = React.useState("")
 
   const [isEditOpen, setIsEditOpen] = React.useState(false)
-  const [editingId, setEditingId] = React.useState<string | null>(null)
-  const [editCourse, setEditCourse] = React.useState("")
-  const [editModality, setEditModality] = React.useState("")
-  const [editDays, setEditDays] = React.useState("")
-  const [editTime, setEditTime] = React.useState("")
-  const [editLocation, setEditLocation] = React.useState("")
-  const [editCapacity, setEditCapacity] = React.useState("")
+  const [editingSchedule, setEditingSchedule] = React.useState<Schedule | null>(null)
 
   const handleDelete = (id: string) => {
     setSchedules((current) => current.filter((item) => item.id !== id))
@@ -100,61 +94,16 @@ export function MonitorSchedulePage() {
     setCapacity("")
   }
 
-  const openEditModal = (schedule: any) => {
-    setFormErrors({})
-    setEditingId(schedule.id)
-    setEditCourse(schedule.course)
-    setEditModality(schedule.modality)
-    setEditDays(schedule.days)
-    setEditTime(schedule.time)
-    setEditLocation(schedule.location)
-    setEditCapacity(schedule.capacity)
+  const openEditModal = (schedule: Schedule) => {
+    setEditingSchedule(schedule)
     setIsEditOpen(true)
   }
 
-  const handleEditSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const errors: Record<string, string> = {}
-
-    if (!editCourse) errors.editCourse = "Selecione a disciplina."
-    if (!editModality) errors.editModality = "Selecione a modalidade."
-    if (!editDays || editDays.trim() === "") errors.editDays = "Informe os dias."
-    if (!editTime || editTime.trim() === "") errors.editTime = "Informe o horário."
-    if (!editLocation || editLocation.trim() === "") errors.editLocation = "Informe a sala ou link."
-    if (!editCapacity || editCapacity.trim() === "") errors.editCapacity = "Informe a capacidade."
-
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors)
-      return
-    }
-
-    setFormErrors({})
-
-    const updatedSchedules = []
-    for (let i = 0; i < schedules.length; i++) {
-      if (schedules[i].id === editingId) {
-        updatedSchedules.push({
-          ...schedules[i],
-          course: editCourse,
-          modality: editModality,
-          days: editDays,
-          time: editTime,
-          location: editLocation,
-          capacity: editCapacity
-        })
-      } else {
-        updatedSchedules.push(schedules[i])
-      }
-    }
-
-    setSchedules(updatedSchedules)
+  const handleSaveSchedule = (updated: Schedule) => {
+    setSchedules((current) =>
+      current.map((item) => (item.id === updated.id ? updated : item))
+    )
     toast.success("Horário atualizado!")
-    setIsEditOpen(false)
-  }
-
-  const onOpenEditChange = (open: boolean) => {
-    setIsEditOpen(open)
-    if (!open) setFormErrors({})
   }
 
   return (
@@ -312,73 +261,14 @@ export function MonitorSchedulePage() {
         </div>
       </div>
 
-      <Dialog open={isEditOpen} onOpenChange={onOpenEditChange}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader className="mb-2">
-            <DialogTitle>Editar Horário</DialogTitle>
-            <DialogDescription>Altere as informações do seu horário de monitoria.</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleEditSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-4">
-              <Field className="md:col-span-2">
-                <FieldLabel>Disciplina</FieldLabel>
-                <Select onValueChange={setEditCourse} value={editCourse}>
-                  <SelectTrigger className={formErrors.editCourse ? "border-destructive" : ""}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {COURSES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-                {formErrors.editCourse && <FieldError errors={[{ message: formErrors.editCourse }]} />}
-              </Field>
-
-              <Field className="md:col-span-2">
-                <FieldLabel>Modalidade</FieldLabel>
-                <Select onValueChange={setEditModality} value={editModality}>
-                  <SelectTrigger className={formErrors.editModality ? "border-destructive" : ""}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Presencial">Presencial</SelectItem>
-                    <SelectItem value="Online">Online</SelectItem>
-                  </SelectContent>
-                </Select>
-                {formErrors.editModality && <FieldError errors={[{ message: formErrors.editModality }]} />}
-              </Field>
-
-              <Field>
-                <FieldLabel>Dias</FieldLabel>
-                <Input value={editDays} onChange={e => setEditDays(e.target.value)} className={formErrors.editDays ? "border-destructive" : ""} />
-                {formErrors.editDays && <FieldError errors={[{ message: formErrors.editDays }]} />}
-              </Field>
-
-              <Field>
-                <FieldLabel>Horário</FieldLabel>
-                <Input value={editTime} onChange={e => setEditTime(e.target.value)} className={formErrors.editTime ? "border-destructive" : ""} />
-                {formErrors.editTime && <FieldError errors={[{ message: formErrors.editTime }]} />}
-              </Field>
-
-              <Field>
-                <FieldLabel>Sala / Link</FieldLabel>
-                <Input value={editLocation} onChange={e => setEditLocation(e.target.value)} className={formErrors.editLocation ? "border-destructive" : ""} />
-                {formErrors.editLocation && <FieldError errors={[{ message: formErrors.editLocation }]} />}
-              </Field>
-
-              <Field>
-                <FieldLabel>Capacidade</FieldLabel>
-                <Input type="number" value={editCapacity} onChange={e => setEditCapacity(e.target.value)} className={formErrors.editCapacity ? "border-destructive" : ""} />
-                {formErrors.editCapacity && <FieldError errors={[{ message: formErrors.editCapacity }]} />}
-              </Field>
-            </div>
-
-            <div className="flex justify-end gap-3 mt-6">
-              <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>Cancelar</Button>
-              <Button type="submit" className="bg-[#0047BA] hover:bg-[#003a99] text-white">Atualizar</Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <EditScheduleFormModal
+        key={editingSchedule?.id}
+        open={isEditOpen}
+        onOpenChange={setIsEditOpen}
+        schedule={editingSchedule}
+        courses={COURSES}
+        onSave={handleSaveSchedule}
+      />
     </div>
   )
 }
