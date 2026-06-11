@@ -1,4 +1,5 @@
 import { WelcomeAdmin } from "./WelcomeAdmin";
+import { AdminSubjectsPage } from "./pages/AdminSubjectsPage";
 import { AdminClassesPage } from "./pages/AdminClassesPage";
 import { AdminMonitorsPage } from "./pages/AdminMonitorsPage";
 
@@ -15,6 +16,10 @@ export const adminRoutes = [
   //   element: <AdminClassroom />,
   //   handle: { title: "Gerenciar Turmas" },
     
+  {
+    path: "AdminSubjects", 
+    element: <AdminSubjectsPage />,
+    handle: { title: "Disciplinas" }
   },
   {
     path: "classes",
