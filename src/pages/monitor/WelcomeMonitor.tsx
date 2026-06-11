@@ -1,106 +1,134 @@
-import {
-  CalendarDays,
-  ClipboardList,
-  Clock,
-  FileText,
-  MapPin,
-  MessageSquare,
-  Users,
-} from "lucide-react"
+import { Calendar, FileText, Users, MessageSquare } from "lucide-react";
+import { useLoaderData, useNavigate } from "react-router";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { WelcomeHeader } from "@/components/shared/WelcomeHeader"
-import { StatCard } from "@/components/shared/StatCard"
-import { StatGrid } from "@/components/shared/StatGrid"
-import { SectionHeading } from "@/components/shared/SectionHeading"
-import { ScheduleCard } from "@/components/shared/ScheduleCard"
-import { ShortcutCard } from "@/components/shared/ShortcutCard"
-import type { Session } from "@/types/monitor/Session.type"
-import { formatHora, hoje } from "@/lib/data-format.lib"
-import { paths } from "@/routes/paths"
+import { Button } from "@/components/ui/button";
+import { WelcomeHeader } from "@/components/shared/WelcomeHeader";
+import { StatCard } from "@/components/shared/StatCard";
+import { StatGrid } from "@/components/shared/StatGrid";
+import { SectionHeading } from "@/components/shared/SectionHeading";
+import { ScheduleCard } from "@/components/shared/ScheduleCard";
+import { ShortcutCard } from "@/components/shared/ShortcutCard";
 
-const MOCK_SESSOES: Session[] = [
-  { id: 1, disciplina: "Cálculo I", local: "Sala C-201", dataISO: "2026-06-05T14:00:00-03:00" },
-  { id: 2, disciplina: "Cálculo I", local: "Sala C-201", dataISO: "2026-06-10T14:00:00-03:00" },
-  { id: 3, disciplina: "Cálculo I", local: "Online — Google Meet", dataISO: "2026-06-17T14:00:00-03:00" },
-]
+import { paths, monitorAttendance } from "@/routes/paths";
+import { formatData, formatHora } from "@/lib/data-format.lib";
+import type { MonitorDashboardLoaderResult } from "@/loaders/monitor-dashboard.loader";
 
-const formatDiaMes = (dataISO: string) =>
-  new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit" }).format(
-    new Date(dataISO),
-  )
+export function WelcomeMonitor() {
+  const { me, upcoming, stats } =
+    useLoaderData() as MonitorDashboardLoaderResult;
+  const navigate = useNavigate();
 
-function WelcomeMonitor() {
+  const attendanceRatePct = Math.round(stats.attendanceRate * 100);
+
   return (
-    <div className="px-4 py-6 md:px-8 md:py-8">
-      <div className="mx-auto w-full max-w-5xl space-y-6">
-        <WelcomeHeader
-          title="Bem-vindo, Brenda Lima"
-          subtitle="Sexta-feira, 5 de junho de 2026. Você tem 1 sessão hoje."
+    <div className="max-w-6xl mx-auto py-8 px-6 w-full">
+      <WelcomeHeader
+        title={`Olá, ${me.first_name} ${me.last_name}`.trim()}
+        subtitle="Aqui está o resumo das suas monitorias."
+      />
+
+      <StatGrid className="mt-6">
+        <StatCard
+          label="Turmas"
+          value={stats.totalClasses}
+          icon={<Users className="size-5" />}
         />
+        <StatCard
+          label="Alunos"
+          value={stats.totalStudents}
+          icon={<Users className="size-5" />}
+        />
+        <StatCard
+          label="Aulas"
+          value={stats.totalLessons}
+          icon={<Calendar className="size-5" />}
+        />
+        <StatCard
+          label="Frequência"
+          value={`${attendanceRatePct}%`}
+          icon={<Calendar className="size-5" />}
+        />
+      </StatGrid>
 
-        <StatGrid>
-          <StatCard icon={<Users className="size-5" />} label="Alunos ativos" value="24" hint="Em Cálculo I" />
-          <StatCard icon={<CalendarDays className="size-5" />} label="Frequências registradas" value="86" hint="Neste semestre" />
-          <StatCard icon={<FileText className="size-5" />} label="Materiais publicados" value="12" hint="4 nas últimas 2 semanas" />
-          <StatCard icon={<Clock className="size-5" />} label="Próxima sessão" value="14:00" hint="Cálculo I · Sala C-201" />
-        </StatGrid>
+      <div className="mt-8 mb-3">
+        <SectionHeading title="Próximas Sessões" />
+      </div>
 
-        <section className="space-y-3">
-          <SectionHeading title="Próximas Sessões" meta="3 agendadas" />
-          <div className="space-y-3">
-            {MOCK_SESSOES.map((item) => {
-              const ehHoje = hoje(item.dataISO)
-              return (
-                <ScheduleCard
-                  key={item.id}
-                  accent={ehHoje}
-                  leading={
-                    <div className="text-center">
-                      <p className="text-lg font-bold leading-none">{formatHora(item.dataISO)}</p>
-                      <p className="text-xs text-muted-foreground">{formatDiaMes(item.dataISO)}</p>
-                    </div>
-                  }
-                  title={item.disciplina}
-                  badge={
-                    ehHoje ? (
-                      <Badge
-                        variant="info"
-                        className="h-4 px-1.5 text-[10px] font-bold uppercase tracking-wide"
-                      >
-                        Hoje
-                      </Badge>
-                    ) : undefined
-                  }
-                  subtitle={
-                    <span className="flex items-center gap-1.5">
-                      <MapPin className="size-4" />
-                      {item.local}
+      {upcoming.length === 0 ? (
+        <div className="rounded-lg border border-dashed p-8 text-center text-muted-foreground text-sm">
+          Nenhuma sessão futura. Crie uma aula em{" "}
+          <button
+            className="underline"
+            onClick={() => navigate(paths.monitorLessons)}
+          >
+            Aulas
+          </button>
+          .
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {upcoming.map((s) => {
+            return (
+              <ScheduleCard
+                key={s.id}
+                accent={s.isToday}
+                badge={
+                  s.isToday ? (
+                    <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                      Hoje
                     </span>
-                  }
-                  action={
-                    <Button variant={ehHoje ? "default" : "outline"} size="sm">
-                      Registrar Frequência
-                    </Button>
-                  }
-                />
-              )
-            })}
-          </div>
-        </section>
+                  ) : undefined
+                }
+                leading={
+                  <div className="size-10 rounded bg-primary/10 text-primary flex items-center justify-center">
+                    <Calendar className="size-5" />
+                  </div>
+                }
+                title={s.subject_name}
+                subtitle={s.modality === "REMOTE" ? "Remota" : "Presencial"}
+                meta={[
+                  { text: formatData(s.date_time) },
+                  { text: formatHora(s.date_time) },
+                ]}
+                action={
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={!s.isToday}
+                    onClick={() => navigate(monitorAttendance(s.id))}
+                  >
+                    Registrar Frequência
+                  </Button>
+                }
+              />
+            );
+          })}
+        </div>
+      )}
 
-        <section className="space-y-3">
-          <SectionHeading title="Atalhos rápidos" />
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <ShortcutCard icon={<FileText className="size-5" />} title="Publicar Material" description="Disponibilize apostilas, listas e slides" to={paths.monitorMaterials} />
-            <ShortcutCard icon={<ClipboardList className="size-5" />} title="Meus Horários" description="Veja salas e horários das suas sessões" to={paths.monitor} />
-            <ShortcutCard icon={<MessageSquare className="size-5" />} title="Fórum da Monitoria" description="Responda dúvidas e converse com a turma" to={paths.monitorForum} />
-          </div>
-        </section>
+      <div className="mt-8 mb-3">
+        <SectionHeading title="Atalhos" />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <ShortcutCard
+          title="Materiais"
+          description="Publique apostilas, listas e slides."
+          icon={<FileText className="size-5" />}
+          to={paths.monitorMaterials}
+        />
+        <ShortcutCard
+          title="Meus Horários"
+          description="Veja e agende aulas por turma."
+          icon={<Calendar className="size-5" />}
+          to={paths.monitorLessons}
+        />
+        <ShortcutCard
+          title="Fórum"
+          description="Tire dúvidas e responda aos alunos."
+          icon={<MessageSquare className="size-5" />}
+          to={paths.monitorForum}
+        />
       </div>
     </div>
-  )
+  );
 }
-
-export { WelcomeMonitor }

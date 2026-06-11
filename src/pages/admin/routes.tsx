@@ -1,7 +1,7 @@
-import AdminClassroom from "./AdminClassroom";
 import { WelcomeAdmin } from "./WelcomeAdmin";
 import { AdminSubjectsPage } from "./pages/AdminSubjectsPage";
-
+import { AdminClassesPage } from "./pages/AdminClassesPage";
+import { AdminMonitorsPage } from "./pages/AdminMonitorsPage";
 
 export const adminRoutes = [
   { index: true, handle: { title: "Início" }, element: <WelcomeAdmin /> },
@@ -11,15 +11,24 @@ export const adminRoutes = [
   //   path: "rota (monitor)",
   //   element: <Pagina />,
   // },
-  {
-    path: "classroom",
-    element: <AdminClassroom />,
-    handle: { title: "Gerenciar Turmas" },
+  // {
+  //   path: "classroom",
+  //   element: <AdminClassroom />,
+  //   handle: { title: "Gerenciar Turmas" },
     
-  },
   {
     path: "AdminSubjects", 
     element: <AdminSubjectsPage />,
     handle: { title: "Disciplinas" }
+  },
+  {
+    path: "classes",
+    element: <AdminClassesPage />,
+    handle: { title: "Turmas" }
+  },
+  {
+    path: "monitors",
+    element: <AdminMonitorsPage />,
+    handle: { title: "Monitores" }
   }
 ]

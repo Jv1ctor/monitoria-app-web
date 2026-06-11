@@ -1,9 +1,11 @@
-import { useState } from "react"
-import { ChevronLeft, Download, FileText } from "lucide-react"
-import { Link } from "react-router"
-import type { Material } from "@/types/student/Material.type"
+import { useState, useEffect } from "react"
+import { ChevronLeft, Download, Eye, FileText } from "lucide-react"
+import { Link, useLoaderData } from "react-router"
+import type { MaterialsLoaderResult } from "@/loaders/materials.loader"
 import { paths } from "@/routes/paths"
 import { toast } from "sonner"
+import { getSignedDownloadAndPreview } from "@/services/document.service"
+import { useRating } from "@/hooks/use-rating.hook"
 
 import {
     Dialog,
@@ -13,46 +15,22 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea"
 
 import { Button } from "@/components/ui/button"
 import { StarRating } from "@/components/shared/StarRating"
 
-
-const MATERIAIS: Material[] = [
-    {
-        id: 1,
-        titulo: "Apostila de Limites",
-        descricao: "Material de apoio sobre conceitos iniciais de limites.",
-        extensao: "PDF",
-        tamanho: "2.1 MB",
-        data: "12/05/2026",
-    },
-    {
-        id: 2,
-        titulo: "Lista de Exercicios - Derivadas",
-        descricao: "Exercicios para praticar o conteudo da monitoria.",
-        extensao: "DOCX",
-        tamanho: "649 KB",
-        data: "14/05/2026",
-    },
-    {
-        id: 3,
-        titulo: "Slides - Integral por partes",
-        descricao: "Slides utilizados durante a explicacao do monitor.",
-        extensao: "PDF",
-        tamanho: "3.8 MB",
-        data: "15/05/2026",
-    },
-]
-
-
-
-
 export default function RatingTeachingAssistant() {
+    const { documents, monitorId, existingRating } = useLoaderData<MaterialsLoaderResult>()
+    const { submitRating, isLoading } = useRating()
     const [open, setOpen] = useState(false)
     const [nota, setNota] = useState(0)
-    const [comentario, setComentario] = useState("")
+    const [loadingKey, setLoadingKey] = useState<string | null>(null)
+
+    useEffect(() => {
+        if (existingRating) {
+            setNota(existingRating.rate)
+        }
+    }, [existingRating])
 
     const sendRating = () => {
         if (nota === 0) {
@@ -60,7 +38,12 @@ export default function RatingTeachingAssistant() {
             return
         }
 
-        console.log({ nota, comentario })
+        const payload = {
+            monitor_id: monitorId,
+            rate: nota,
+        }
+
+        submitRating(payload)
 
         toast.success("Avaliacao enviada com sucesso", {
             description: "Obrigado pelo seu feedback sobre a monitoria.",
@@ -68,7 +51,14 @@ export default function RatingTeachingAssistant() {
 
         setOpen(false)
         setNota(0)
-        setComentario("")
+    }
+
+    const formatBytes = (bytes: number) => {
+        if (bytes === 0) return "0 B"
+        const k = 1024
+        const sizes = ["B", "KB", "MB", "GB"]
+        const i = Math.floor(Math.log(bytes) / Math.log(k))
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i]
     }
 
     return (
@@ -91,9 +81,9 @@ export default function RatingTeachingAssistant() {
 
                             <div>
                                 <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                                    Calculo I - Monitor Joao Luiz
+                                    Monitoria
                                 </p>
-                                <h1 className="mt-1">Derivada</h1>
+                                <h1 className="mt-1">Materiais da Monitoria</h1>
                             </div>
                         </div>
 
@@ -106,39 +96,89 @@ export default function RatingTeachingAssistant() {
                 <section className="space-y-2">
                     <h2>Materiais publicados</h2>
 
-                    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-card">
-                        {MATERIAIS.map((material, index) => (
-                            <article
-                                key={material.id}
-                                className={[
-                                    "flex flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between",
-                                    index !== MATERIAIS.length - 1 ? "border-b border-border" : "",
-                                ].join(" ")}
-                            >
-                                <div className="flex items-start gap-3">
-                                    <div className="rounded-md bg-info/10 p-2 text-info">
-                                        <FileText className="size-4" />
-                                    </div>
+                    {documents.length === 0 ? (
+                        <div className="py-8 text-sm text-muted-foreground border border-dashed rounded-lg text-center">
+                            Nenhum material publicado para esta monitoria.
+                        </div>
+                    ) : (
+                        <div className="overflow-hidden rounded-lg border border-border bg-card shadow-card">
+                            {documents.map((material, index) => {
+                                const dateObj = new Date(material.createdAt)
+                                const dateLabel = dateObj.toLocaleDateString("pt-BR", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                })
+                                const sizeLabel = formatBytes(material.size)
+                                const extLabel = material.mime_type.split("/").pop()?.toUpperCase() ?? "ARQ"
 
-                                    <div>
-                                        <p className="font-semibold">{material.titulo}</p>
-                                        <p className="text-sm text-muted-foreground">{material.descricao}</p>
-                                    </div>
-                                </div>
+                                return (
+                                    <article
+                                        key={material.id}
+                                        className={[
+                                            "flex flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between",
+                                            index !== documents.length - 1 ? "border-b border-border" : "",
+                                        ].join(" ")}
+                                    >
+                                        <div className="flex items-start gap-3">
+                                            <div className="rounded-md bg-info/10 p-2 text-info">
+                                                <FileText className="size-4" />
+                                            </div>
 
-                                <div className="flex items-center gap-3 md:gap-4">
-                                    <span className="text-xs text-muted-foreground">
-                                        {material.extensao} - {material.tamanho}
-                                    </span>
-                                    <span className="text-xs text-muted-foreground">{material.data}</span>
-                                    <Button size="sm">
-                                        <Download className="size-4" />
-                                        Baixar
-                                    </Button>
-                                </div>
-                            </article>
-                        ))}
-                    </div>
+                                            <div>
+                                                <p className="font-semibold">{material.filename}</p>
+                                                <p className="text-sm text-muted-foreground">{material.description ?? "Sem descrição"}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-3 md:gap-4">
+                                            <span className="text-xs text-muted-foreground">
+                                                {extLabel} - {sizeLabel}
+                                            </span>
+                                            <span className="text-xs text-muted-foreground">{dateLabel}</span>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                disabled={loadingKey === material.key}
+                                                onClick={async () => {
+                                                    setLoadingKey(material.key)
+                                                    try {
+                                                        const { preview_url } = await getSignedDownloadAndPreview(material.key)
+                                                        window.open(preview_url, "_blank")
+                                                    } catch (e) {
+                                                        toast.error("Erro ao visualizar")
+                                                    } finally {
+                                                        setLoadingKey(null)
+                                                    }
+                                                }}
+                                            >
+                                                <Eye className="size-4" />
+                                                Visualizar
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                disabled={loadingKey === material.key}
+                                                onClick={async () => {
+                                                    setLoadingKey(material.key)
+                                                    try {
+                                                        const { download_url } = await getSignedDownloadAndPreview(material.key)
+                                                        window.open(download_url, "_blank")
+                                                    } catch (e) {
+                                                        toast.error("Erro ao baixar")
+                                                    } finally {
+                                                        setLoadingKey(null)
+                                                    }
+                                                }}
+                                            >
+                                                <Download className="size-4" />
+                                                Baixar
+                                            </Button>
+                                        </div>
+                                    </article>
+                                )
+                            })}
+                        </div>
+                    )}
                 </section>
             </div>
 
@@ -146,29 +186,22 @@ export default function RatingTeachingAssistant() {
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Avaliar Monitor</DialogTitle>
-                        <DialogDescription>Calculo I - Joao Luiz</DialogDescription>
+                        <DialogDescription>Deixe sua avaliação sobre a monitoria</DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-3">
                         <p className="text-sm font-medium">Sua avaliacao</p>
 
                         <StarRating value={nota} onChange={setNota} size="lg" />
-
-                        <div className="space-y-1">
-                            <p className="text-sm font-medium">Comentario</p>
-                            <Textarea
-                                value={comentario}
-                                onChange={(e) => setComentario(e.target.value)}
-                                placeholder="Escreva seu feedback"
-                            />
-                        </div>
                     </div>
 
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setOpen(false)}>
                             Cancelar
                         </Button>
-                        <Button onClick={sendRating}>Enviar Avaliacao</Button>
+                        <Button onClick={sendRating} disabled={isLoading}>
+                            Enviar Avaliacao
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

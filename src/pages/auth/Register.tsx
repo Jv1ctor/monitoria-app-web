@@ -29,7 +29,7 @@ import { Spinner } from "@/components/ui/spinner"
 import { registerSchema } from "@/schemas/auth"
 import { paths } from "@/routes/paths"
 import { useAuth } from "@/hooks/use-auth.hook"
-import type { MajorLoaderResult } from "@/loader/major.loader"
+import type { MajorLoaderResult } from "@/loaders/major.loader"
 
 function splitName(name: string): { firstName: string; lastName: string } {
   const parts = name.trim().split(/\s+/)
@@ -127,7 +127,6 @@ export function RegisterPage() {
       navigate(paths.student)
     }
   }, [isSuccess, user, navigate])
-
 
   if (isSuccess && !user) {
     return (

@@ -112,7 +112,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
           </div>
         }
         navComponents={props.navs.map((nav) => (
-          <NavLink className={navLinkClass} to={nav.path} key={nav.label}>
+          <NavLink className={navLinkClass} end to={nav.path} key={nav.label}>
             {nav.label}
           </NavLink>
         ))}
