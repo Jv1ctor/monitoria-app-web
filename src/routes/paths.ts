@@ -27,6 +27,10 @@ export const paths = {
 
   // admin
   admin: "/admin",
+  adminSubjects: "/admin/subjects",
+  adminClasses: "/admin/classes",
+  adminStudentsClass: "/admin/studentsClass",
+  adminMonitors: "/admin/monitors",
 }
 
 // O fórum é compartilhado entre os papéis; resolve o caminho pelo papel atual.
