@@ -22,6 +22,7 @@ export default function EditMonitorFormModal() {
     ]
     return (
         <FormModal
+            id="edit-monitor-form"
             labelIcon={<EditIcon />}
             title="Editar Monitor"
             description="Altere informações e/ou turmas do respectivo monitor."

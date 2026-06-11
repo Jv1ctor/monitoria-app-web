@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Field, FieldLabel, FieldError } from "@/components/ui/field"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import SelectComponent from "@/components/shared/SelectComponent"
+import DialogComponent from "@/components/shared/DialogComponent"
 import EditScheduleFormModal, { type Schedule } from "./components/EditScheduleFormModal"
 
 const initialSchedules = [
@@ -36,6 +37,11 @@ const COURSES = [
   { value: "Álgebra Linear", label: "Álgebra Linear" }
 ]
 
+const MODALITIES = [
+  { value: "Presencial", label: "Presencial" },
+  { value: "Online", label: "Online" },
+]
+
 export function MonitorSchedulePage() {
   const [schedules, setSchedules] = React.useState(initialSchedules)
 
@@ -50,9 +56,20 @@ export function MonitorSchedulePage() {
   const [isEditOpen, setIsEditOpen] = React.useState(false)
   const [editingSchedule, setEditingSchedule] = React.useState<Schedule | null>(null)
 
-  const handleDelete = (id: string) => {
-    setSchedules((current) => current.filter((item) => item.id !== id))
+  const [isDeleteOpen, setIsDeleteOpen] = React.useState(false)
+  const [deletingSchedule, setDeletingSchedule] = React.useState<Schedule | null>(null)
+
+  const openDeleteModal = (schedule: Schedule) => {
+    setDeletingSchedule(schedule)
+    setIsDeleteOpen(true)
+  }
+
+  const confirmDelete = () => {
+    if (!deletingSchedule) return
+    setSchedules((current) => current.filter((item) => item.id !== deletingSchedule.id))
     toast.success("Horário removido com sucesso!")
+    setIsDeleteOpen(false)
+    setDeletingSchedule(null)
   }
 
   const handleCreateSubmit = (e: React.FormEvent) => {
@@ -120,28 +137,27 @@ export function MonitorSchedulePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
               <Field>
                 <FieldLabel>Disciplina</FieldLabel>
-                <Select onValueChange={setCourse} value={course}>
-                  <SelectTrigger className={formErrors.course ? "border-destructive" : ""}>
-                    <SelectValue placeholder="Selecione..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {COURSES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+                <SelectComponent
+                  label="Disciplina"
+                  placeholder="Selecione..."
+                  items={COURSES}
+                  value={course}
+                  onValueChange={setCourse}
+                  className={formErrors.course ? "border-destructive" : undefined}
+                />
                 {formErrors.course && <FieldError errors={[{ message: formErrors.course }]} />}
               </Field>
 
               <Field>
                 <FieldLabel>Modalidade</FieldLabel>
-                <Select onValueChange={setModality} value={modality}>
-                  <SelectTrigger className={formErrors.modality ? "border-destructive" : ""}>
-                    <SelectValue placeholder="Selecione..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Presencial">Presencial</SelectItem>
-                    <SelectItem value="Online">Online</SelectItem>
-                  </SelectContent>
-                </Select>
+                <SelectComponent
+                  label="Modalidade"
+                  placeholder="Selecione..."
+                  items={MODALITIES}
+                  value={modality}
+                  onValueChange={setModality}
+                  className={formErrors.modality ? "border-destructive" : undefined}
+                />
                 {formErrors.modality && <FieldError errors={[{ message: formErrors.modality }]} />}
               </Field>
 
@@ -248,7 +264,7 @@ export function MonitorSchedulePage() {
                       <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-foreground" onClick={() => openEditModal(schedule)}>
                         <Pencil className="size-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete(schedule.id)}>
+                      <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10" onClick={() => openDeleteModal(schedule)}>
                         <Trash2 className="size-4" />
                       </Button>
                     </div>
@@ -269,6 +285,30 @@ export function MonitorSchedulePage() {
         courses={COURSES}
         onSave={handleSaveSchedule}
       />
+
+      <DialogComponent
+        title="Excluir horário"
+        description="Esta ação não pode ser desfeita. O horário deixará de ficar visível para os alunos."
+        isOpen={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
+        icon={<Trash2 />}
+      >
+        {deletingSchedule && (
+          <p className="text-sm text-muted-foreground">
+            Tem certeza que deseja excluir o horário de{" "}
+            <span className="font-semibold text-foreground">{deletingSchedule.course}</span>{" "}
+            ({deletingSchedule.days} · {deletingSchedule.time})?
+          </p>
+        )}
+        <div className="flex justify-end gap-3 mt-6">
+          <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
+            Cancelar
+          </Button>
+          <Button variant="destructive" onClick={confirmDelete}>
+            Excluir horário
+          </Button>
+        </div>
+      </DialogComponent>
     </div>
   )
 }

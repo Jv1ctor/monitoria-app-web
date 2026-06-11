@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react"
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar } from "@/components/shared/Avatar"
 import { SearchBar } from "@/components/shared/search-bar"
 import {
   Table,
@@ -73,11 +73,7 @@ export default function AdminStudents() {
                 <TableRow key={student.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <Avatar size="default">
-                        <AvatarFallback className="bg-primary text-white">
-                          {student.initials}
-                        </AvatarFallback>
-                      </Avatar>
+                      <Avatar initials={student.initials} />
                       <span className="font-semibold">{student.name}</span>
                     </div>
                   </TableCell>

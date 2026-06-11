@@ -4,7 +4,6 @@ import {
   CalendarCheck,
   CalendarDays,
   Clock,
-  MessageSquare,
   Search,
 } from "lucide-react"
 
@@ -38,10 +37,9 @@ function WelcomeStudent() {
 
         <section className="space-y-3">
           <SectionHeading title="Atalhos rápidos" />
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <ShortcutCard icon={<Search className="size-5" />} title="Buscar Disciplina" description="Encontre novas monitorias para acompanhar" to={paths.studentSearch} />
             <ShortcutCard icon={<CalendarDays className="size-5" />} title="Minha Frequência" description="Acompanhe sua presença nas sessões" to={paths.studentFrequency} />
-            <ShortcutCard icon={<MessageSquare className="size-5" />} title="Fórum da Monitoria" description="Tire dúvidas e converse com a turma" to={paths.studentForum} />
           </div>
         </section>
       </div>

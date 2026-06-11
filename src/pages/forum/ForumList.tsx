@@ -1,29 +1,26 @@
 import * as React from "react"
 import { useLoaderData, useNavigate } from "react-router"
 import { MessageSquare, Trash2, Plus, InfoIcon } from "lucide-react"
-import { toast } from "sonner" 
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
-// import { createTopicSchema } from "@/schemas/forum"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Field, FieldLabel, FieldError } from "@/components/ui/field"
+import FormModal from "@/components/shared/FormModal"
+import SelectComponent from "@/components/shared/SelectComponent"
+import { createTopicSchema } from "@/schemas/forum"
 import type { User } from "@/types/User"
 import type { Topic } from "@/types/forum/Topic.type"
 import { forumByRole } from "@/routes/paths"
 import { initialTopics } from "./forum.mock"
 
-// const COURSES = [
-//   { value: "calculo1", label: "Cálculo I" },
-//   { value: "estrutura", label: "Estrutura de Dados" },
-//   { value: "discreta", label: "Matemática Discreta" },
-// ]
+const COURSES = [
+  { value: "calculo1", label: "Cálculo I" },
+  { value: "estrutura", label: "Estrutura de Dados" },
+  { value: "discreta", label: "Matemática Discreta" },
+]
 
 export function ForumListPage() {
   const navigate = useNavigate()
@@ -32,10 +29,17 @@ export function ForumListPage() {
   const [topics, setTopics] = React.useState<Topic[]>(initialTopics)
 
   const [isSheetOpen, setIsSheetOpen] = React.useState(false)
-  // const [selectedCourse, setSelectedCourse] = React.useState("")
-  // const [, setFormErrors] = React.useState<Record<string, string>>({})
-  // const titleRef = React.useRef<HTMLInputElement>(null)
-  // const contentRef = React.useRef<HTMLTextAreaElement>(null)
+  const [selectedCourse, setSelectedCourse] = React.useState("")
+  const [title, setTitle] = React.useState("")
+  const [content, setContent] = React.useState("")
+  const [formErrors, setFormErrors] = React.useState<Record<string, string>>({})
+
+  const resetForm = () => {
+    setSelectedCourse("")
+    setTitle("")
+    setContent("")
+    setFormErrors({})
+  }
 
   const handleDelete = (e: React.MouseEvent, topicId: string) => {
     e.stopPropagation() // vai evitar que o clique na lixeira abra o card do tópico
@@ -47,44 +51,34 @@ export function ForumListPage() {
     navigate(`${forumByRole[role]}/${topicId}`)
   }
 
-  // TODO: reativar quando o formulário de criação de tópico for implementado
-  // const handleCreateSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault()
-  //   setFormErrors({})
+  const handleCreateSubmit = () => {
+    const data = { course: selectedCourse, title, content }
+    const result = createTopicSchema.safeParse(data)
 
-  //   const data = {
-  //     course: selectedCourse,
-  //     title: titleRef.current?.value || "",
-  //     content: contentRef.current?.value || ""
-  //   }
-  //
-  //   const result = createTopicSchema.safeParse(data)
+    if (!result.success) {
+      const errors: Record<string, string> = {}
+      result.error.issues.forEach((issue) => {
+        errors[issue.path[0] as string] = issue.message
+      })
+      setFormErrors(errors)
+      return
+    }
 
-  //   if (!result.success) {
-  //     const errors: Record<string, string> = {}
-  //     result.error.issues.forEach((issue) => errors[issue.path[0] as string] = issue.message)
-  //     setFormErrors(errors)
-  //     return
-  //   }
+    const newTopic: Topic = {
+      id: Math.random().toString(),
+      title: data.title,
+      tag: COURSES.find((c) => c.value === data.course)?.label || data.course,
+      preview: data.content,
+      author: { firstName: id.firstName, lastName: id.lastName },
+      date: "Agora",
+      repliesCount: 0,
+    }
 
-  //   const newTopic: Topic = {
-  //     id: Math.random().toString(),
-  //     title: data.title,
-  //     tag: COURSES.find(c => c.value === data.course)?.label || data.course,
-  //     preview: data.content,
-  //     author: { firstName: id.firstName, lastName: id.lastName },
-  //     date: "Agora",
-  //     repliesCount: 0
-  //   }
-
-  //   setTopics([newTopic, ...topics])
-  //   toast.success("Tópico publicado!")
-  //   setIsSheetOpen(false)
-  //
-  //   setSelectedCourse("")
-  //   if (titleRef.current) titleRef.current.value = ""
-  //   if (contentRef.current) contentRef.current.value = ""
-  // }
+    setTopics([newTopic, ...topics])
+    toast.success("Tópico publicado!")
+    setIsSheetOpen(false)
+    resetForm()
+  }
 
   return (
     <div className="max-w-5xl mx-auto py-8 px-6 w-full">
@@ -93,27 +87,12 @@ export function ForumListPage() {
           <h1 className="text-3xl font-bold text-foreground tracking-tight">Fórum da Monitoria</h1>
           <p className="text-sm text-muted-foreground mt-1">Tire dúvidas e converse com a turma.</p>
         </div>
-        
-        {role === "monitor" && (
-          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-            <SheetTrigger asChild>
-              <Button>
-                <Plus className="mr-2 size-4" />
-                Novo Tópico
-              </Button>
-            </SheetTrigger>
-            
-            <SheetContent className="sm:max-w-xl w-full overflow-y-auto">
-              <SheetHeader className="mb-6">
-                <SheetTitle>Novo Tópico</SheetTitle>
-                <SheetDescription>
-                  Inicie uma discussão para sua turma preenchendo os dados abaixo.
-                </SheetDescription>
-              </SheetHeader>
 
-              {/* <FormModal/> */}
-            </SheetContent>
-          </Sheet>
+        {role === "monitor" && (
+          <Button onClick={() => setIsSheetOpen(true)}>
+            <Plus className="mr-2 size-4" />
+            Novo Tópico
+          </Button>
         )}
       </div>
 
@@ -124,8 +103,8 @@ export function ForumListPage() {
           </div>
         ) : (
           topics.map((topic) => (
-            <Card 
-              key={topic.id} 
+            <Card
+              key={topic.id}
               onClick={() => handleCardClick(topic.id)}
               className="shadow-sm border-border cursor-pointer hover:border-primary/50 hover:shadow-md hover:bg-muted/10 transition-all"
             >
@@ -145,8 +124,8 @@ export function ForumListPage() {
                 </div>
                 {role === "monitor" && (
                   <button
-                    onClick={(e) => handleDelete(e, topic.id)} 
-                    className="text-muted-foreground hover:text-destructive transition-colors p-2 z-10" 
+                    onClick={(e) => handleDelete(e, topic.id)}
+                    className="text-muted-foreground hover:text-destructive transition-colors p-2 z-10"
                     title="Excluir"
                   >
                     <Trash2 className="size-4" />
@@ -157,6 +136,61 @@ export function ForumListPage() {
           ))
         )}
       </div>
+
+      {role === "monitor" && (
+        <FormModal
+          id="create-topic-form"
+          open={isSheetOpen}
+          onOpenChange={(open) => {
+            setIsSheetOpen(open)
+            if (!open) resetForm()
+          }}
+          title="Novo Tópico"
+          description="Inicie uma discussão para sua turma preenchendo os dados abaixo."
+          handleSafeChanges={handleCreateSubmit}
+          handleCloseModal={() => {
+            setIsSheetOpen(false)
+            resetForm()
+          }}
+          labelSaveModalButton="Publicar"
+          labelCloseModalButton="Cancelar"
+        >
+          <Field>
+            <FieldLabel>Disciplina</FieldLabel>
+            <SelectComponent
+              label="Disciplina"
+              placeholder="Selecione..."
+              items={COURSES}
+              value={selectedCourse}
+              onValueChange={setSelectedCourse}
+              className={formErrors.course ? "border-destructive" : undefined}
+            />
+            {formErrors.course && <FieldError errors={[{ message: formErrors.course }]} />}
+          </Field>
+
+          <Field>
+            <FieldLabel>Título</FieldLabel>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Ex: Dúvida sobre limites"
+              className={formErrors.title ? "border-destructive focus-visible:ring-destructive" : ""}
+            />
+            {formErrors.title && <FieldError errors={[{ message: formErrors.title }]} />}
+          </Field>
+
+          <Field>
+            <FieldLabel>Mensagem</FieldLabel>
+            <Textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Descreva sua dúvida ou tópico de discussão"
+              className={formErrors.content ? "border-destructive focus-visible:ring-destructive" : ""}
+            />
+            {formErrors.content && <FieldError errors={[{ message: formErrors.content }]} />}
+          </Field>
+        </FormModal>
+      )}
     </div>
   )
 }

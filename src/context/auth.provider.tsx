@@ -1,6 +1,7 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { AuthContext } from "@/context/auth.context"
 import { loginRequest, registerRequest } from "@/services/auth.service"
+import { meRequest } from "@/services/user.service"
 import { getToken, getUserFromToken } from "@/lib/jwt"
 import type {
   AuthContextData,
@@ -17,6 +18,22 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   )
   const [isLoading, setIsLoading] = useState(false)
 
+  // Completa o usuário com o perfil de /user/me (matrícula, sobrenome, etc.),
+  // que não vêm no JWT. Cai no decode do token se a requisição falhar.
+  async function loadUser(token: string) {
+    const me = await meRequest()
+    setUser(me ?? getUserFromToken(token))
+  }
+
+  // Ao iniciar com um token salvo, enriquece o usuário decodificado do JWT.
+  useEffect(() => {
+    const token = getToken()
+    if (!token) return
+    meRequest().then((me) => {
+      if (me) setUser(me)
+    })
+  }, [])
+
   async function login(
     regitration: string,
     password: string,
@@ -31,7 +48,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (result.accessToken) {
         localStorage.setItem("access_token", result.accessToken)
-        setUser(getUserFromToken(result.accessToken))
+        await loadUser(result.accessToken)
       }
 
       return result
@@ -69,7 +86,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (loginResult.accessToken) {
         localStorage.setItem("access_token", loginResult.accessToken)
-        setUser(getUserFromToken(loginResult.accessToken))
+        await loadUser(loginResult.accessToken)
       }
 
       return loginResult

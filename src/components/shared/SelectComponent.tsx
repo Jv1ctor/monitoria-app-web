@@ -25,7 +25,7 @@ export default function SelectComponent(props: SelectComponentProps) {
                 <SelectGroup>
                     <SelectLabel>{props.label}</SelectLabel>
                     {props.items.map(({key, value, label}) => (
-                        <SelectItem key={key} value={value}>{label}</SelectItem>
+                        <SelectItem key={key ?? value} value={value}>{label}</SelectItem>
                     ))}
                 </SelectGroup>
             </SelectContent>

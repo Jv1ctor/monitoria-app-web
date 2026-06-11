@@ -5,18 +5,12 @@ import type { Material } from "@/types/student/Material.type"
 import { paths } from "@/routes/paths"
 import { toast } from "sonner"
 
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 
 import { Button } from "@/components/ui/button"
 import { StarRating } from "@/components/shared/StarRating"
+import DialogComponent from "@/components/shared/DialogComponent"
+import EntityPreview from "@/components/shared/EntityPreview"
 
 
 const MATERIAIS: Material[] = [
@@ -75,32 +69,27 @@ export default function RatingTeachingAssistant() {
         <div className="px-4 py-6 md:px-8 md:py-8">
             <div className="mx-auto w-full max-w-5xl space-y-4">
                 <Link
-                    to={paths.student}
+                    to={paths.studentMonitorings}
                     className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
                 >
                     <ChevronLeft className="size-4" />
                     Voltar para Conteudos
                 </Link>
 
-                <section className="rounded-lg border border-border bg-card p-5 shadow-card">
-                    <div className="flex items-start justify-between gap-4">
-                        <div className="flex items-start gap-3">
-                            <div className="rounded-md bg-info/10 p-2 text-info">
-                                <FileText className="size-5" />
-                            </div>
-
-                            <div>
-                                <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                                    Calculo I - Monitor Joao Luiz
-                                </p>
-                                <h1 className="mt-1">Derivada</h1>
-                            </div>
-                        </div>
-
-                        <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
-                            Avaliar Monitor
-                        </Button>
-                    </div>
+                <section className="flex flex-col w-full items-end justify-between gap-4">
+                  <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
+                    Avaliar Monitor
+                  </Button>
+                  <EntityPreview
+                    className="w-full"
+                    leading={
+                      <div className="rounded-md bg-info/10 p-2 text-info">
+                        <FileText className="size-5" />
+                      </div>
+                    }
+                    upSubtitle="Calculo I - Monitor Joao Luiz"
+                    title="Derivada"
+                  />
                 </section>
 
                 <section className="space-y-2">
@@ -142,36 +131,34 @@ export default function RatingTeachingAssistant() {
                 </section>
             </div>
 
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Avaliar Monitor</DialogTitle>
-                        <DialogDescription>Calculo I - Joao Luiz</DialogDescription>
-                    </DialogHeader>
+            <DialogComponent
+              title="Avaliar Monitor"
+              description="Calculo I - Joao Luiz"
+              isOpen={open}
+              onOpenChange={setOpen}
+            >
+              <div className="space-y-3">
+                <p className="text-sm font-medium">Sua avaliacao</p>
 
-                    <div className="space-y-3">
-                        <p className="text-sm font-medium">Sua avaliacao</p>
+                <StarRating value={nota} onChange={setNota} size="lg" />
 
-                        <StarRating value={nota} onChange={setNota} size="lg" />
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Comentario</p>
+                  <Textarea
+                    value={comentario}
+                    onChange={(e) => setComentario(e.target.value)}
+                    placeholder="Escreva seu feedback"
+                  />
+                </div>
+              </div>
 
-                        <div className="space-y-1">
-                            <p className="text-sm font-medium">Comentario</p>
-                            <Textarea
-                                value={comentario}
-                                onChange={(e) => setComentario(e.target.value)}
-                                placeholder="Escreva seu feedback"
-                            />
-                        </div>
-                    </div>
-
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setOpen(false)}>
-                            Cancelar
-                        </Button>
-                        <Button onClick={sendRating}>Enviar Avaliacao</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+              <div className="flex justify-end gap-3">
+                <Button variant="outline" onClick={() => setOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button onClick={sendRating}>Enviar Avaliacao</Button>
+              </div>
+            </DialogComponent>
         </div>
     )
 }

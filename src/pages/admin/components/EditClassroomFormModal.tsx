@@ -39,6 +39,7 @@ export default function EditClassroomFormModal() {
 
   return (
     <FormModal
+      id="edit-classroom-form"
       labelIcon={<EditIcon />}
       title="Editar Turma"
       description="Cálculo I"

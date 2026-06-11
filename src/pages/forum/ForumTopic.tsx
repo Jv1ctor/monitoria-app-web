@@ -3,7 +3,8 @@ import { NavLink, useLoaderData, useParams } from "react-router"
 import { ChevronLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { getInitials } from "@/lib/getInitials"
+import { Avatar } from "@/components/shared/Avatar"
+import EntityPreview from "@/components/shared/EntityPreview"
 import type { User } from "@/types/User"
 import type { Reply } from "@/types/forum/Reply.type"
 import { forumByRole } from "@/routes/paths"
@@ -78,15 +79,12 @@ export function ForumTopicPage() {
             {topic.title}
           </h1>
 
-          <div className="flex items-center gap-3 mb-6">
-            <div className="size-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
-              {getInitials(topic.author)}
-            </div>
-            <div>
-              <p className="text-sm font-bold text-foreground leading-tight">{topic.author.firstName} {topic.author.lastName}</p>
-              <p className="text-xs text-muted-foreground">Autor do Tópico</p>
-            </div>
-          </div>
+          <EntityPreview
+            className="mb-6"
+            leading={<Avatar name={topic.author} size="lg" />}
+            title={`${topic.author.firstName} ${topic.author.lastName}`}
+            subtitle="Autor do Tópico"
+          />
 
           <p className="text-sm text-foreground leading-relaxed">
             {topic.preview}
@@ -107,11 +105,11 @@ export function ForumTopicPage() {
               <Card key={reply.id} className="shadow-sm border-border">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className={`size-8 rounded-full flex items-center justify-center font-bold text-xs ${
-                      reply.role === "monitor" ? "bg-info text-white" : "bg-primary text-primary-foreground"
-                    }`}>
-                      {getInitials(reply.author)}
-                    </div>
+                    <Avatar
+                      name={reply.author}
+                      size="sm"
+                      className={reply.role === "monitor" ? "bg-info text-white font-bold" : "font-bold"}
+                    />
 
                     <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2">
                       <div className="flex items-center gap-2">

@@ -1,7 +1,8 @@
 import { useMemo } from "react"
 import { Calendar, Clock3 } from "lucide-react"
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar } from "@/components/shared/Avatar"
+import { ScheduleCard } from "@/components/shared/ScheduleCard"
 import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/shared/empty-state"
 import { Badge } from "@/components/ui/badge"
@@ -58,46 +59,33 @@ const Dashboard = () => {
                 ) : (
                     <div className="space-y-3">
                         {monitoriasOrdenadas.map((item) => (
-                            <article
+                            <ScheduleCard
                                 key={item.id}
-                                className="rounded-lg border border-border bg-card shadow-card"
-                            >
-                                <div className={`flex flex-col gap-3 rounded-l-lg border-l-4 ${hoje(item.dataISO) ? "border-l-4 border-l-primary/50 " : "border-l-4 border-l-primary"} p-4 md:flex-row md:items-center md:justify-between`}>
-                                    <div className="flex items-center gap-3">
-                                        <Avatar size="default">
-                                            <AvatarFallback className="bg-primary text-white">
-                                                {item.monitorIniciais}
-                                            </AvatarFallback>
-                                        </Avatar>
-
-                                        <div>
-                                            <div className="flex items-center gap-2"> <p className="text-base font-semibold">{item.disciplina}</p> {hoje(item.dataISO) && (<Badge variant="info" className="h-4 px-1.5 text-[10px] font-bold uppercase tracking-wide"> Hoje </Badge>)} </div>
-                                            <p className="text-sm text-muted-foreground">
-                                                Monitor:{" "}
-                                                <span className="font-semibold">{item.monitorNome}</span>
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex flex-wrap items-center gap-4 md:gap-6">
-                                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                                            <Calendar className="size-4" />
-                                            <span>{formatData(item.dataISO)}</span>
-                                        </div>
-
-                                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                                            <Clock3 className="size-4" />
-                                            <span>{formatHora(item.dataISO)}</span>
-                                        </div>
-
-                                        <Button variant="outline" size="sm">
-                                            <NavLink to={studentMaterial(item.id)}>
-                                                Ver detalhes
-                                            </NavLink>
-                                        </Button>
-                                    </div>
-                                </div>
-                            </article>
+                                accent={hoje(item.dataISO)}
+                                leading={<Avatar initials={item.monitorIniciais} />}
+                                title={item.disciplina}
+                                badge={
+                                    hoje(item.dataISO) && (
+                                        <Badge variant="info" className="h-4 px-1.5 text-[10px] font-bold uppercase tracking-wide">
+                                            Hoje
+                                        </Badge>
+                                    )
+                                }
+                                subtitle={
+                                    <>
+                                        Monitor: <span className="font-semibold">{item.monitorNome}</span>
+                                    </>
+                                }
+                                meta={[
+                                    { icon: <Calendar className="size-4" />, text: formatData(item.dataISO) },
+                                    { icon: <Clock3 className="size-4" />, text: formatHora(item.dataISO) },
+                                ]}
+                                action={
+                                    <Button variant="outline" size="sm" asChild>
+                                        <NavLink to={studentMaterial(item.id)}>Ver detalhes</NavLink>
+                                    </Button>
+                                }
+                            />
                         ))}
                     </div>
                 )}

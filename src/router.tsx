@@ -1,5 +1,4 @@
 import { createBrowserRouter, Navigate } from "react-router"
-import { DesignSystem } from "./pages/DesignSystem"
 import { PublicLayout } from "./components/layout/public-layout"
 import { PublicPage } from "./pages/PublicPage/PublicPage"
 import { Layout } from "./components/layout/auth-layout"
@@ -7,9 +6,9 @@ import { LoginPage } from "./pages/auth/Login"
 import { RegisterPage } from "./pages/auth/Register"
 import { RecoverPasswordPage } from "./pages/auth/RecoverPassword"
 import { authLoader } from "./loader/auth.loader"
-import { studentRoutes } from "./pages/student/routes"
-import { monitorRoutes } from "./pages/monitor/routes"
-import { adminRoutes } from "./pages/admin/routes"
+import { studentRoutes, studentNavs } from "./pages/student/routes"
+import { monitorRoutes, monitorNavs } from "./pages/monitor/routes"
+import { adminRoutes, adminNavs } from "./pages/admin/routes"
 import { guestGuardMiddleware } from "./middleware/guestGuard.middleware"
 import { majorLoader } from "./loader/major.loader"
 import { SpinnerFallback } from "./components/shared/SpinnerFallback"
@@ -42,24 +41,20 @@ export const router = createBrowserRouter([
   },
   {
     path: "/student",
-    element: <Layout />,
+    element: <Layout navs={studentNavs} />,
     loader: authLoader,
     children: [...studentRoutes],
   },
   {
     path: "/monitor",
-    element: <Layout />,
+    element: <Layout navs={monitorNavs} />,
     loader: authLoader,
     children: [...monitorRoutes],
   },
   {
     path: "/admin",
-    element: <Layout />,
+    element: <Layout navs={adminNavs} />,
     loader: authLoader,
     children: [...adminRoutes],
-  },
-  {
-    path: "/ds",
-    element: <DesignSystem />,
   },
 ])

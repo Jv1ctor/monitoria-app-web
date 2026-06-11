@@ -1,10 +1,17 @@
-import { ForumListPage } from "../forum/ForumList";
-import { ForumTopicPage } from "../forum/ForumTopic";
+import type { NavItem } from "@/components/layout/auth-layout";
+import { paths } from "@/routes/paths";
 import { AvailableMonitoringsPage } from "./pages/availableMonitoring/AvailableMonitorings";
 import RatingTeachingAssistant from "./pages/ratingTeacher/RatingTeachingAssistant";
 import { SpecificMonitoringPage } from "./pages/specificMonitoring/SpecificMonitoring";
-import { StudentAttendancePage } from "./StudentAttendance";
+import { StudentAttendancePage } from "./pages/frequencyStudent/StudentAttendance";
 import { WelcomeStudent } from "./WelcomeStudent";
+
+export const studentNavs: NavItem[] = [
+  { label: "Início", path: paths.student },
+  { label: "Buscar Disciplina", path: paths.studentSearch },
+  { label: "Minhas Monitorias", path: paths.studentMonitorings },
+  { label: "Frequência", path: paths.studentFrequency },
+];
 
 export const studentRoutes = [
   { index: true, element: <WelcomeStudent /> },
@@ -21,15 +28,7 @@ export const studentRoutes = [
     element: <RatingTeachingAssistant />,
   },
   {
-    path: "/studentAttendance",
+    path: "studentAttendance",
     element: <StudentAttendancePage />,
-  },
-  {
-    path: "forum",
-    element: <ForumListPage />,
-  },
-  {
-    path: "forum/:id",
-    element: <ForumTopicPage />,
   },
 ]

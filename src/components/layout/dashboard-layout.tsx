@@ -1,10 +1,10 @@
-import { NavLink, Outlet, useNavigate } from "react-router"
+import { NavLink, Outlet } from "react-router"
 import { List, LogOut } from "lucide-react"
 
 import { Button } from "../ui/button"
 import { Topbar } from "./topbar"
 import { Footer } from "./footer"
-import { Avatar, AvatarFallback } from "../ui/avatar"
+import { Avatar } from "@/components/shared/Avatar"
 import {
   Sheet,
   SheetClose,
@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils"
 import { getInitials } from "@/lib/getInitials"
 import { useAuth } from "@/hooks/use-auth.hook"
+import { useNavigation } from "@/hooks/use-navigation.hook"
 import { paths } from "@/routes/paths"
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) => (
@@ -36,12 +37,12 @@ type DashboardLayoutProps = {
 
 function DashboardLayout(props: DashboardLayoutProps) {
   const { logout } = useAuth()
-  const navigate = useNavigate()
+  const { handleNavigateTo } = useNavigation()
   const initials = getInitials({firstName: props.firstName, lastName: props.lastName})
 
   const handleLogout = () => {
     logout()
-    navigate(paths.login)
+    handleNavigateTo(paths.login)
   }
 
   return (
@@ -50,13 +51,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
         actions={
           <div className="flex flex-row items-center lg:gap-4">
             <div className="hidden lg:flex items-center gap-4">
-              <Avatar size="default">
-                <AvatarFallback className="bg-primary text-white font-bold">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
+              <Avatar initials={initials} className="font-bold" />
               <div className="flex flex-col items-end">
-                <p className="text-sm font-semibold">{props.firstName + props.lastName}</p>
+                <p className="text-sm font-semibold">{props.firstName} {props.lastName}</p>
                 <p className="text-sm text-muted-foreground">{props.registration}</p>
               </div>
               <Button
@@ -79,19 +76,15 @@ function DashboardLayout(props: DashboardLayoutProps) {
                     <div className="flex flex-col justify-center gap-5">
                       {props.navs.map((nav) => (
                         <SheetClose asChild key={nav.label}>
-                          <NavLink to={nav.path}>
+                          <NavLink to={nav.path} end>
                             <Button variant="ghost">{nav.label}</Button>
                           </NavLink>
                         </SheetClose>
                       ))}
                       <div className="flex items-center gap-4 pt-6 border-t">
-                        <Avatar size="default">
-                          <AvatarFallback className="bg-primary text-white font-bold">
-                            {initials}
-                          </AvatarFallback>
-                        </Avatar>
+                        <Avatar initials={initials} className="font-bold" />
                         <div className="flex flex-col">
-                          <p className="text-sm font-semibold">{props.firstName}</p>
+                          <p className="text-sm font-semibold">{props.firstName} {props.lastName}</p>
                           <p className="text-sm text-muted-foreground">
                             {props.registration}
                           </p>
@@ -112,7 +105,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
           </div>
         }
         navComponents={props.navs.map((nav) => (
-          <NavLink className={navLinkClass} to={nav.path} key={nav.label}>
+          <NavLink className={navLinkClass} to={nav.path} key={nav.label} end>
             {nav.label}
           </NavLink>
         ))}

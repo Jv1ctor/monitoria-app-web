@@ -4,10 +4,10 @@ import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import SelectComponent from "@/components/shared/SelectComponent"
+import FormModal from "@/components/shared/FormModal"
 
 const initialMaterials = [
   { id: "1", title: "Apostila de Limites", course: "Cálculo I", type: "PDF", date: "12/05/2026" },
@@ -45,8 +45,7 @@ export function MaterialsListPage() {
     toast.success("Material excluído com sucesso!")
   }
 
-  const handleCreateSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleCreateSubmit = () => {
     const errors: Record<string, string> = {}
 
     if (!createTitle || createTitle.trim() === "") errors.title = "O título é obrigatório."
@@ -60,7 +59,7 @@ export function MaterialsListPage() {
     } else {
       const fileName = selectedFile.name.toLowerCase()
       const isValidExtension = ALLOWED_EXTENSIONS.some(ext => fileName.endsWith(ext))
-      
+
       if (!isValidExtension) {
         errors.file = "Formato inválido. Apenas .pdf, .docx ou .pptx são aceitos."
       } else {
@@ -75,36 +74,34 @@ export function MaterialsListPage() {
       return
     }
 
-    setFormErrors({}) 
+    setFormErrors({})
 
     const newMaterial = {
       id: Math.random().toString(),
       title: createTitle,
       course: createCourse,
       type: autoDetectedType,
-      date: "Agora", 
+      date: "Agora",
     }
 
     setMaterials([newMaterial, ...materials])
     toast.success("Material publicado!")
     setIsCreateOpen(false)
-    
+
     setCreateTitle("")
     setCreateCourse("")
     if (fileRef.current) fileRef.current.value = ""
   }
 
   const openEditModal = (material: any) => {
-    setFormErrors({}) 
+    setFormErrors({})
     setEditingId(material.id)
     setEditTitle(material.title)
     setEditCourse(material.course)
     setIsEditOpen(true)
   }
 
-  const handleEditSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-
+  const handleEditSubmit = () => {
     const errors: Record<string, string> = {}
 
     if (!editTitle || editTitle.trim() === "") errors.editTitle = "O título não pode ficar vazio."
@@ -153,69 +150,62 @@ export function MaterialsListPage() {
           <p className="text-sm text-muted-foreground mt-1">Publique apostilas, listas e slides.</p>
         </div>
 
-        <Dialog open={isCreateOpen} onOpenChange={onOpenCreateChange}>
-          <DialogTrigger asChild>
-            <Button className="bg-[#0047BA] hover:bg-[#003a99] text-white">
-              <Plus className="mr-2 size-4" />
-              Publicar Material
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader className="mb-2">
-              <DialogTitle>Publicar Material</DialogTitle>
-              <DialogDescription>Preencha os dados e selecione o arquivo (.pdf, .docx, .pptx).</DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleCreateSubmit}>
-              <FieldGroup className="gap-5">
-                <Field>
-                  <FieldLabel>Título do Material</FieldLabel>
-                  <Input 
-                    value={createTitle} 
-                    onChange={(e) => setCreateTitle(e.target.value)} 
-                    placeholder="Ex: Lista de Exercícios 01" 
-                    className={formErrors.title ? "border-destructive focus-visible:ring-destructive" : ""}
-                  />
-                  {formErrors.title && <FieldError errors={[{ message: formErrors.title }]} />}
-                </Field>
+        <Button className="bg-[#0047BA] hover:bg-[#003a99] text-white" onClick={() => setIsCreateOpen(true)}>
+          <Plus className="mr-2 size-4" />
+          Publicar Material
+        </Button>
 
-                <Field>
-                  <FieldLabel>Disciplina</FieldLabel>
-                  <Select onValueChange={setCreateCourse} value={createCourse}>
-                    <SelectTrigger className={formErrors.course ? "border-destructive" : ""}>
-                      <SelectValue placeholder="Selecione..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {COURSES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                  {formErrors.course && <FieldError errors={[{ message: formErrors.course }]} />}
-                </Field>
+        <FormModal
+          id="create-material-form"
+          open={isCreateOpen}
+          onOpenChange={onOpenCreateChange}
+          title="Publicar Material"
+          description="Preencha os dados e selecione o arquivo (.pdf, .docx, .pptx)."
+          handleSafeChanges={handleCreateSubmit}
+          handleCloseModal={() => setIsCreateOpen(false)}
+          labelSaveModalButton="Salvar"
+          labelCloseModalButton="Cancelar"
+        >
+          <Field>
+            <FieldLabel>Título do Material</FieldLabel>
+            <Input
+              value={createTitle}
+              onChange={(e) => setCreateTitle(e.target.value)}
+              placeholder="Ex: Lista de Exercícios 01"
+              className={formErrors.title ? "border-destructive focus-visible:ring-destructive" : ""}
+            />
+            {formErrors.title && <FieldError errors={[{ message: formErrors.title }]} />}
+          </Field>
 
-                <Field>
-                  <FieldLabel>Arquivo</FieldLabel>
-                  <Input 
-                    type="file" 
-                    ref={fileRef}
-                    accept=".pdf,.docx,.pptx" 
-                    className={`cursor-pointer ${formErrors.file ? "border-destructive focus-visible:ring-destructive" : ""}`}
-                  />
-                  {formErrors.file && <FieldError errors={[{ message: formErrors.file }]} />}
-                </Field>
+          <Field>
+            <FieldLabel>Disciplina</FieldLabel>
+            <SelectComponent
+              label="Disciplina"
+              placeholder="Selecione..."
+              items={COURSES}
+              value={createCourse}
+              onValueChange={setCreateCourse}
+              className={formErrors.course ? "border-destructive" : undefined}
+            />
+            {formErrors.course && <FieldError errors={[{ message: formErrors.course }]} />}
+          </Field>
 
-                <div className="flex justify-end gap-3 mt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>Cancelar</Button>
-                  <Button type="submit" className="bg-[#0047BA] hover:bg-[#003a99]">Salvar</Button>
-                </div>
-              </FieldGroup>
-            </form>
-          </DialogContent>
-        </Dialog>
+          <Field className="flex flex-col">
+            <FieldLabel >Arquivo</FieldLabel>
+            <Input
+              type="file"
+              ref={fileRef}
+              accept=".pdf, .docx, .pptx"
+            />
+            {formErrors.file && <FieldError errors={[{ message: formErrors.file }]} />}
+          </Field>
+        </FormModal>
       </div>
 
       <Table>
         <TableHeader className="bg-muted/30">
           <TableRow>
-            <TableHead className="w-[300px] text-xs font-bold text-muted-foreground uppercase">Título</TableHead>
+            <TableHead className="w-75 text-xs font-bold text-muted-foreground uppercase">Título</TableHead>
             <TableHead className="text-xs font-bold text-muted-foreground uppercase">Disciplina</TableHead>
             <TableHead className="text-xs font-bold text-muted-foreground uppercase">Tipo</TableHead>
             <TableHead className="text-xs font-bold text-muted-foreground uppercase">Publicado</TableHead>
@@ -261,43 +251,39 @@ export function MaterialsListPage() {
         </TableBody>
       </Table>
 
-      <Dialog open={isEditOpen} onOpenChange={onOpenEditChange}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader className="mb-2">
-            <DialogTitle>Editar Material</DialogTitle>
-            <DialogDescription>Altere as informações do material selecionado.</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleEditSubmit}>
-            <FieldGroup className="gap-5">
-              <Field>
-                <FieldLabel>Título do Material</FieldLabel>
-                <Input 
-                  value={editTitle} 
-                  onChange={(e) => setEditTitle(e.target.value)} 
-                  className={formErrors.editTitle ? "border-destructive focus-visible:ring-destructive" : ""}
-                />
-                {formErrors.editTitle && <FieldError errors={[{ message: formErrors.editTitle }]} />}
-              </Field>
-              <Field>
-                <FieldLabel>Disciplina</FieldLabel>
-                <Select onValueChange={setEditCourse} value={editCourse}>
-                  <SelectTrigger className={formErrors.editCourse ? "border-destructive" : ""}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {COURSES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-                {formErrors.editCourse && <FieldError errors={[{ message: formErrors.editCourse }]} />}
-              </Field>
-              <div className="flex justify-end gap-3 mt-4">
-                <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>Cancelar</Button>
-                <Button type="submit" className="bg-[#0047BA] hover:bg-[#003a99]">Atualizar</Button>
-              </div>
-            </FieldGroup>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <FormModal
+        id="edit-material-form"
+        open={isEditOpen}
+        onOpenChange={onOpenEditChange}
+        title="Editar Material"
+        description="Altere as informações do material selecionado."
+        handleSafeChanges={handleEditSubmit}
+        handleCloseModal={() => setIsEditOpen(false)}
+        labelSaveModalButton="Atualizar"
+        labelCloseModalButton="Cancelar"
+      >
+        <Field>
+          <FieldLabel>Título do Material</FieldLabel>
+          <Input
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            className={formErrors.editTitle ? "border-destructive focus-visible:ring-destructive" : ""}
+          />
+          {formErrors.editTitle && <FieldError errors={[{ message: formErrors.editTitle }]} />}
+        </Field>
+        <Field>
+          <FieldLabel>Disciplina</FieldLabel>
+          <SelectComponent
+            label="Disciplina"
+            placeholder="Selecione..."
+            items={COURSES}
+            value={editCourse}
+            onValueChange={setEditCourse}
+            className={formErrors.editCourse ? "border-destructive" : undefined}
+          />
+          {formErrors.editCourse && <FieldError errors={[{ message: formErrors.editCourse }]} />}
+        </Field>
+      </FormModal>
     </div>
   )
 }

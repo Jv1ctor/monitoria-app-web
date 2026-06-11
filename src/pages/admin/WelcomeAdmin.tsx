@@ -13,6 +13,7 @@ import { StatCard } from "@/components/shared/StatCard"
 import { StatGrid } from "@/components/shared/StatGrid"
 import { SectionHeading } from "@/components/shared/SectionHeading"
 import { ShortcutCard } from "@/components/shared/ShortcutCard"
+import { DonutChart } from "@/components/shared/DonutChart"
 function WelcomeAdmin() {
   return (
     <div className="bg-muted/30 px-4 py-6 md:px-8 md:py-8">
@@ -48,15 +49,6 @@ function WelcomeAdmin() {
             hint="Em 6 disciplinas"
           />
         </StatGrid>
-
-        <section className="space-y-3">
-          <SectionHeading title="Indicadores do programa" meta="2026.1" />
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            {/* <DonutChart title="Frequência por disciplina" data={FREQUENCIA_DISCIPLINA} />
-            <DonutChart title="Avaliação de monitores" data={AVALIACAO_MONITORES} />
-            <DonutChart title="Engajamento no fórum" data={ENGAJAMENTO_FORUM} /> */}
-          </div>
-        </section>
 
         <section className="space-y-3">
           <SectionHeading title="Atalhos rápidos" />

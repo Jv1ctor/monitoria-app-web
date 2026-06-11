@@ -1,10 +1,11 @@
 import * as React from "react"
 import { ChevronLeft, CalendarDays, Clock, MapPin, CheckCircle2 } from "lucide-react"
-import { useNavigate, useLocation } from "react-router"
+import { useNavigate, useLocation, Link } from "react-router"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { studentMaterial } from "@/routes/paths"
+import { paths, studentMaterial } from "@/routes/paths"
+import { Avatar } from "@/components/shared/Avatar"
 
 
 const initialEnrolled = [
@@ -59,9 +60,7 @@ function MonitorCard({ data, isEnrolled = false, onAction, onUnenroll }: Monitor
       <CardContent className="p-5 flex flex-col h-full">
         <div className="flex justify-between items-start mb-6">
           <div className="flex gap-3 items-center">
-            <div className="size-10 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-sm shrink-0">
-              {initials}
-            </div>
+            <Avatar initials={initials} size="lg" className="bg-slate-800 text-white font-bold" />
             <div className="flex flex-col">
               <span className="font-bold text-foreground text-base leading-tight">{data.name}</span>
               <span className="text-xs text-muted-foreground">{data.course}</span>
@@ -156,14 +155,13 @@ export function SpecificMonitoringPage() {
 
   return (
     <div className="max-w-5xl mx-auto py-8 px-6 w-full">
-      <Button 
-        variant="ghost" 
-        className="mb-6 -ml-4 text-muted-foreground hover:text-foreground"
-        onClick={() => navigate(-1)}
+      <Link
+        to={paths.studentSearch}
+        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ChevronLeft className="mr-1 size-4" />
         Voltar à busca
-      </Button>
+      </Link>
 
       <div className="mb-10">
         <h1 className="text-3xl font-bold text-foreground tracking-tight mb-2">

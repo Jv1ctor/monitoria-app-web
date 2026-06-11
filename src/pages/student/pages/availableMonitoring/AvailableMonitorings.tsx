@@ -1,9 +1,9 @@
 import * as React from "react"
 import { Book, Users, ChevronRight, ChevronLeft } from "lucide-react"
-import { useNavigate } from "react-router"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { useNavigation } from "@/hooks/use-navigation.hook"
 import { paths } from "@/routes/paths"
 
 const mockMonitorings = [
@@ -33,8 +33,8 @@ const mockMonitorings = [
 const ITEMS_PER_PAGE = 12
 
 export function AvailableMonitoringsPage() {
-  const navigate = useNavigate()
-  
+  const { handleNavigateTo } = useNavigation()
+
   const [monitorings] = React.useState(mockMonitorings)
   const [currentPage, setCurrentPage] = React.useState(1)
 
@@ -49,7 +49,7 @@ export function AvailableMonitoringsPage() {
   }
 
   const handleCardClick = (title: string) => {
-    navigate(paths.studentMonitorings, { state: { subjectTitle: title } })
+    handleNavigateTo(paths.studentMonitorings, { state: { subjectTitle: title } })
   }
 
   return (

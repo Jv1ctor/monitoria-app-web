@@ -21,6 +21,7 @@ export default function EditSubjectFormModal() {
 
   return (
     <FormModal
+      id="edit-subject-form"
       labelIcon={<EditIcon />}
       title="Editar Disciplina"
       description="MAT0101 - Cálculo I"

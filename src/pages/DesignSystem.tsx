@@ -167,9 +167,6 @@ export const DesignSystem = () => {
             <NavLink to={"/ds"} key="buscar_disciplinas">
               Buscar Disciplina
             </NavLink>,
-            <NavLink to={"/ds"} key="forum">
-              Forum
-            </NavLink>,
           ]}
         />
       }

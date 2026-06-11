@@ -4,7 +4,6 @@ import {
   Clock,
   FileText,
   MapPin,
-  MessageSquare,
   Users,
 } from "lucide-react"
 
@@ -23,7 +22,7 @@ import { paths } from "@/routes/paths"
 const MOCK_SESSOES: Session[] = [
   { id: 1, disciplina: "Cálculo I", local: "Sala C-201", dataISO: "2026-06-05T14:00:00-03:00" },
   { id: 2, disciplina: "Cálculo I", local: "Sala C-201", dataISO: "2026-06-10T14:00:00-03:00" },
-  { id: 3, disciplina: "Cálculo I", local: "Online — Google Meet", dataISO: "2026-06-17T14:00:00-03:00" },
+  { id: 3, disciplina: "Cálculo I", local: "Google Meet", dataISO: "2026-06-17T14:00:00-03:00" },
 ]
 
 const formatDiaMes = (dataISO: string) =>
@@ -92,10 +91,9 @@ function WelcomeMonitor() {
 
         <section className="space-y-3">
           <SectionHeading title="Atalhos rápidos" />
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <ShortcutCard icon={<FileText className="size-5" />} title="Publicar Material" description="Disponibilize apostilas, listas e slides" to={paths.monitorMaterials} />
-            <ShortcutCard icon={<ClipboardList className="size-5" />} title="Meus Horários" description="Veja salas e horários das suas sessões" to={paths.monitor} />
-            <ShortcutCard icon={<MessageSquare className="size-5" />} title="Fórum da Monitoria" description="Responda dúvidas e converse com a turma" to={paths.monitorForum} />
+            <ShortcutCard icon={<ClipboardList className="size-5" />} title="Meus Horários" description="Veja salas e horários das suas sessões" to={paths.monitorSchedule} />
           </div>
         </section>
       </div>
