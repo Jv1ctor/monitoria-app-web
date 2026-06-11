@@ -12,8 +12,8 @@ export const paths = {
 
   // aluno
   student: "/student",
-  studentSearch: "/student/availableMonitorings",
-  studentMonitorings: "/student/specificMonitoring",
+  studentMonitorings: "/student/monitoring",
+  studentMyMonitorings: "/student/my-monitoring",
   studentFrequency: "/student/frequencies",
   studentMaterials: "/student/materials",
   studentForum: "/student/forum",
