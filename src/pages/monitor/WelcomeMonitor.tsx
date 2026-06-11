@@ -8,6 +8,7 @@ import {
   Users,
 } from "lucide-react"
 
+import { useNavigate } from "react-router"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { WelcomeHeader } from "@/components/shared/WelcomeHeader"
@@ -18,7 +19,7 @@ import { ScheduleCard } from "@/components/shared/ScheduleCard"
 import { ShortcutCard } from "@/components/shared/ShortcutCard"
 import type { Session } from "@/types/monitor/Session.type"
 import { formatHora, hoje } from "@/lib/data-format.lib"
-import { paths } from "@/routes/paths"
+import { paths, monitorAttendance } from "@/routes/paths"
 
 const MOCK_SESSOES: Session[] = [
   { id: 1, disciplina: "Cálculo I", local: "Sala C-201", dataISO: "2026-06-05T14:00:00-03:00" },
@@ -32,6 +33,8 @@ const formatDiaMes = (dataISO: string) =>
   )
 
 function WelcomeMonitor() {
+  const navigate = useNavigate()
+
   return (
     <div className="px-4 py-6 md:px-8 md:py-8">
       <div className="mx-auto w-full max-w-5xl space-y-6">
@@ -80,7 +83,11 @@ function WelcomeMonitor() {
                     </span>
                   }
                   action={
-                    <Button variant={ehHoje ? "default" : "outline"} size="sm">
+                    <Button
+                      variant={ehHoje ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => navigate(monitorAttendance(item.id))}
+                    >
                       Registrar Frequência
                     </Button>
                   }

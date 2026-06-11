@@ -1,8 +1,9 @@
 import { WelcomeMonitor } from "./WelcomeMonitor";
 import { ForumListPage } from "../forum/ForumList";
 import { ForumTopicPage } from "../forum/ForumTopic";
-import { MaterialsListPage } from "../monitor/pages/materials/MaterialsList";
-import { AvailableMonitoringsPage } from "../student/pages/availableMonitoring/AvailableMonitorings";
+import { MaterialsListPage } from "./pages/materials/MaterialsList";
+import { LessonsPage } from "./pages/lessons/LessonsPage";
+import { AttendanceFrequencyPage } from "./AttendanceFrequency";
 
 export const monitorRoutes = [
   { index: true, handle: { title: "Inicio" }, element: <WelcomeMonitor /> },
@@ -11,8 +12,12 @@ export const monitorRoutes = [
     element: <MaterialsListPage />,
   },
   {
-    path: "availableMonitorings",
-    element: <AvailableMonitoringsPage />,
+    path: "lessons",
+    element: <LessonsPage />,
+  },
+  {
+    path: "attendance/:lessonId",
+    element: <AttendanceFrequencyPage />,
   },
   {
     path: "forum",

@@ -25,6 +25,7 @@ export const studentDashboardLoader = async (): Promise<StudentDashboardLoaderRe
     getFrequenciesByStudent(me.id),
   ]);
 
+  console.log(frequencies)
   const totalSessions = frequencies.length;
   const totalPresences = frequencies.filter((f) => f.value === true).length;
   const attendanceRate =
