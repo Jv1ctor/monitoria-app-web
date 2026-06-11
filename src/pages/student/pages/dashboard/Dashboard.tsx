@@ -32,7 +32,12 @@ const Dashboard = ({ lessons }: DashboardProps) => {
                     />
                 ) : (
                     <div className="space-y-3">
-                        {monitoriasOrdenadas.map((item) => (
+                        {monitoriasOrdenadas.map((item) => {
+                            const subjectName = item.class?.subject?.name ?? item.modality
+                            const monitorFullName = item.class?.monitor
+                                ? `${item.class.monitor.first_name} ${item.class.monitor.last_name}`
+                                : `Monitor #${item.class_id}`
+                            return (
                             <article
                                 key={item.id}
                                 className="rounded-lg border border-border bg-card shadow-card"
@@ -41,15 +46,15 @@ const Dashboard = ({ lessons }: DashboardProps) => {
                                     <div className="flex items-center gap-3">
                                         <Avatar size="default">
                                             <AvatarFallback className="bg-primary text-white">
-                                                {item.modality.substring(0, 2).toUpperCase()}
+                                                {(item.class?.subject?.name ?? item.modality).substring(0, 2).toUpperCase()}
                                             </AvatarFallback>
                                         </Avatar>
 
                                         <div>
-                                            <div className="flex items-center gap-2"> <p className="text-base font-semibold">{item.modality}</p> {hoje(item.date_time) && (<Badge variant="info" className="h-4 px-1.5 text-[10px] font-bold uppercase tracking-wide"> Hoje </Badge>)} </div>
+                                            <div className="flex items-center gap-2"> <p className="text-base font-semibold">{subjectName}</p> {hoje(item.date_time) && (<Badge variant="info" className="h-4 px-1.5 text-[10px] font-bold uppercase tracking-wide"> Hoje </Badge>)} </div>
                                             <p className="text-sm text-muted-foreground">
                                                 Monitor:{" "}
-                                                <span className="font-semibold">Monitor #{item.class_id}</span>
+                                                <span className="font-semibold">{monitorFullName}</span>
                                             </p>
                                         </div>
                                     </div>
@@ -73,7 +78,8 @@ const Dashboard = ({ lessons }: DashboardProps) => {
                                     </div>
                                 </div>
                             </article>
-                        ))}
+                            )
+                        })}
                     </div>
                 )}
             </div>

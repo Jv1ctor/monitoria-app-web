@@ -1,5 +1,11 @@
 import * as React from "react"
-import { ChevronLeft, CalendarDays, Clock, MapPin, CheckCircle2 } from "lucide-react"
+import {
+  ChevronLeft,
+  CalendarDays,
+  Clock,
+  MapPin,
+  CheckCircle2,
+} from "lucide-react"
 import { useNavigate, useParams, useRevalidator } from "react-router"
 import { useLoaderData } from "react-router"
 import { toast } from "sonner"
@@ -18,23 +24,38 @@ interface MonitorCardProps {
   onUnenroll: (id: number) => void
 }
 
-function MonitorCard({ data, isEnrolled = false, onViewContent, onEnroll, onUnenroll }: MonitorCardProps) {
+function MonitorCard({
+  data,
+  isEnrolled = false,
+  onViewContent,
+  onEnroll,
+  onUnenroll,
+}: MonitorCardProps) {
   const dateObj = new Date(data.date_time)
-  const dateLabel = dateObj.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })
-  const timeLabel = dateObj.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
-  const initials = data.modality.substring(0, 2).toUpperCase()
+  const dateLabel = dateObj.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  })
+  const timeLabel = dateObj.toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  })
 
   return (
     <Card className="shadow-sm border-border">
       <CardContent className="p-5 flex flex-col h-full">
         <div className="flex justify-between items-start mb-6">
           <div className="flex gap-3 items-center">
-            <div className="size-10 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-sm shrink-0">
-              {initials}
-            </div>
             <div className="flex flex-col">
-              <span className="font-bold text-foreground text-base leading-tight">{data.modality}</span>
-              <span className="text-xs text-muted-foreground">{data.description ?? "Sem descrição"}</span>
+              <span className="font-bold text-foreground text-xl">
+                {data.description ?? "Sem descrição"}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {data.class?.monitor
+                  ? `Monitor: ${data.class.monitor.first_name} ${data.class.monitor.last_name}`
+                  : "Monitor não atribuído"}
+              </span>
             </div>
           </div>
 
@@ -67,7 +88,7 @@ function MonitorCard({ data, isEnrolled = false, onViewContent, onEnroll, onUnen
               <Button
                 variant="outline"
                 className="w-full text-foreground"
-                onClick={() => onViewContent(data.id)}
+                onClick={() => onViewContent(data.class_id)}
               >
                 Ver conteúdos
               </Button>
@@ -96,18 +117,19 @@ function MonitorCard({ data, isEnrolled = false, onViewContent, onEnroll, onUnen
 export function SpecificMonitoringPage() {
   const navigate = useNavigate()
   const params = useParams<{ id: string }>()
-  const { lessons, enrolledLessonIds } = useLoaderData<SpecificMonitoringLoaderResult>()
+  const { lessons, enrolledLessonIds } =
+    useLoaderData<SpecificMonitoringLoaderResult>()
   const { enroll, unenroll } = useLessonEnrollment()
   const revalidator = useRevalidator()
 
-  const enrolled = React.useMemo(() =>
-    lessons.filter((l) => enrolledLessonIds.includes(l.id)),
-    [lessons, enrolledLessonIds]
+  const enrolled = React.useMemo(
+    () => lessons.filter((l) => enrolledLessonIds.includes(l.id)),
+    [lessons, enrolledLessonIds],
   )
 
-  const available = React.useMemo(() =>
-    lessons.filter((l) => !enrolledLessonIds.includes(l.id)),
-    [lessons, enrolledLessonIds]
+  const available = React.useMemo(
+    () => lessons.filter((l) => !enrolledLessonIds.includes(l.id)),
+    [lessons, enrolledLessonIds],
   )
 
   const handleEnroll = async (id: number) => {
@@ -116,7 +138,9 @@ export function SpecificMonitoringPage() {
       toast.success("Inscrição realizada")
       revalidator.revalidate()
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao realizar inscrição")
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao realizar inscrição",
+      )
     }
   }
 
@@ -126,7 +150,9 @@ export function SpecificMonitoringPage() {
       toast.success("Inscrição cancelada")
       revalidator.revalidate()
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao cancelar inscrição")
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao cancelar inscrição",
+      )
     }
   }
 
@@ -152,20 +178,26 @@ export function SpecificMonitoringPage() {
           Monitores de {subjectTitle}
         </h1>
         <p className="text-sm text-muted-foreground">
-          Acompanhe as monitorias em que você está inscrito ou escolha uma nova para participar.
+          Acompanhe as monitorias em que você está inscrito ou escolha uma nova
+          para participar.
         </p>
       </div>
 
       <div className="flex flex-col gap-10">
         <section>
           <div className="flex items-center gap-2 mb-4">
-            <h2 className="text-lg font-bold text-foreground">Monitorias Inscritas</h2>
-            <span className="text-sm text-muted-foreground">({enrolled.length})</span>
+            <h2 className="text-lg font-bold text-foreground">
+              Monitorias Inscritas
+            </h2>
+            <span className="text-sm text-muted-foreground">
+              ({enrolled.length})
+            </span>
           </div>
 
           {enrolled.length === 0 ? (
             <div className="py-8 text-sm text-muted-foreground border border-dashed rounded-lg text-center">
-              Você ainda não está inscrito em nenhuma monitoria desta disciplina.
+              Você ainda não está inscrito em nenhuma monitoria desta
+              disciplina.
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -185,13 +217,18 @@ export function SpecificMonitoringPage() {
 
         <section>
           <div className="flex items-center gap-2 mb-4">
-            <h2 className="text-lg font-bold text-foreground">Monitorias Disponíveis</h2>
-            <span className="text-sm text-muted-foreground">({available.length})</span>
+            <h2 className="text-lg font-bold text-foreground">
+              Monitorias Disponíveis
+            </h2>
+            <span className="text-sm text-muted-foreground">
+              ({available.length})
+            </span>
           </div>
 
           {available.length === 0 ? (
             <div className="py-8 text-sm text-muted-foreground border border-dashed rounded-lg text-center">
-              Não há mais monitorias disponíveis para esta disciplina no momento.
+              Não há mais monitorias disponíveis para esta disciplina no
+              momento.
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

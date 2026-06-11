@@ -6,11 +6,13 @@ import { SpecificMonitoringPage } from "./pages/specificMonitoring/SpecificMonit
 import { StudentAttendancePage } from "./pages/attendance/StudentAttendance"
 import { WelcomeStudent } from "./WelcomeStudent"
 import { MyMonitorings } from "./pages/myMonitoring/MyMonitorings"
+import { MyMonitoringClassPage } from "./pages/myMonitoring/MyMonitoringClassPage"
 import { availableMonitoringsLoader } from "@/loaders/available-monitorings.loader"
 import { specificMonitoringLoader } from "@/loaders/specific-monitoring.loader"
 import { materialsLoader } from "@/loaders/materials.loader"
 import { studentAttendanceLoader } from "@/loaders/student-attendance.loader"
 import { myMonitoringsLoader } from "@/loaders/my-monitorings.loader"
+import { myMonitoringClassLoader } from "@/loaders/my-monitoring-class.loader"
 import { studentDashboardLoader } from "@/loaders/student-dashboard.loader"
 
 export const studentRoutes = [
@@ -30,6 +32,12 @@ export const studentRoutes = [
     path: "my-monitoring",
     element: <MyMonitorings />,
     loader: myMonitoringsLoader,
+  },
+
+  {
+    path: "my-monitoring/:id",
+    element: <MyMonitoringClassPage/>,
+    loader: myMonitoringClassLoader,
   },
 
   {

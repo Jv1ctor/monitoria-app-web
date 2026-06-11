@@ -36,7 +36,7 @@ function WelcomeStudent() {
       ? `${today.charAt(0).toUpperCase() + today.slice(1)} · Você tem ${stats.upcomingCount} monitoria(s) agendada(s).`
       : "Nenhuma monitoria agendada."
 
-  const uniqueDisciplines = new Set(enrolledLessons.map((l) => l.class_id)).size
+  const uniqueDisciplines = new Set(enrolledLessons.map((l) => l.class?.subject?.name ?? l.class_id)).size
 
   const nextLessonText =
     enrolledLessons.length > 0
@@ -45,7 +45,7 @@ function WelcomeStudent() {
             (a, b) => new Date(a.date_time).getTime() - new Date(b.date_time).getTime()
           )
           const first = sorted[0]
-          return `${formatHora(first.date_time)} · ${first.modality}`
+          return `${formatHora(first.date_time)} · ${first.class?.subject?.name ?? first.modality}`
         })()
       : "--:--"
 
@@ -58,7 +58,7 @@ function WelcomeStudent() {
           <StatCard icon={<CalendarCheck className="size-5" />} label="Frequência geral" value={`${stats.attendanceRate}%`} hint="Acima da meta de 75%" />
           <StatCard icon={<Calendar className="size-5" />} label="Monitorias agendadas" value={`${stats.upcomingCount}`} hint="Nos próximos 7 dias" />
           <StatCard icon={<BookOpen className="size-5" />} label="Disciplinas acompanhadas" value={`${uniqueDisciplines}`} hint="Neste semestre" />
-          <StatCard icon={<Clock className="size-5" />} label="Próxima monitoria" value={nextLessonText} hint={enrolledLessons.length > 0 ? enrolledLessons[0].modality : "Sem monitorias"} />
+          <StatCard icon={<Clock className="size-5" />} label="Próxima monitoria" value={nextLessonText} hint={enrolledLessons.length > 0 ? (enrolledLessons[0].class?.subject?.name ?? enrolledLessons[0].modality) : "Sem monitorias"} />
         </StatGrid>
 
         <section className="space-y-3">

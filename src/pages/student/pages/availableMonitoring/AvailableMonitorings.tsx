@@ -61,7 +61,7 @@ export function AvailableMonitoringsPage() {
               <div className="flex justify-between items-center mt-auto">
                 <div className="bg-blue-50 text-[#0047BA] px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
                   <Users className="size-3.5" />
-                  {item.monitorsCount} monitor{item.monitorsCount === 1 ? "" : "es"}
+                  Monitor: {item.monitorName}
                 </div>
                 <ChevronRight className="size-4 text-muted-foreground group-hover:text-[#0047BA] transition-colors" />
               </div>

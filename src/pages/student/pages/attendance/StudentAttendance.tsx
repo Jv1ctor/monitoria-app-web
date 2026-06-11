@@ -11,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import type { StudentAttendanceLoaderResult } from "@/loaders/student-attendance.loader"
 
 export function StudentAttendancePage() {
-  const { me, frequencies, lessonsById } = useLoaderData<StudentAttendanceLoaderResult>()
+  const { me, frequencies } = useLoaderData<StudentAttendanceLoaderResult>()
 
   const totalSessions = frequencies.length
   const totalPresences = frequencies.filter(
@@ -81,7 +81,7 @@ export function StudentAttendancePage() {
                   Disciplina
                 </th>
                 <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
-                  Status Registro
+                  Monitor
                 </th>
                 <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-widest text-right">
                   Status
@@ -90,7 +90,7 @@ export function StudentAttendancePage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {frequencies.map((item) => {
-                const lesson = lessonsById[item.lesson_id]
+                const lesson = item.lesson
                 const dateObj = lesson ? new Date(lesson.date_time) : new Date(item.createdAt)
                 const dateLabel = dateObj.toLocaleDateString("pt-BR", {
                   day: "2-digit",
@@ -98,7 +98,10 @@ export function StudentAttendancePage() {
                   year: "numeric",
                 })
                 const timeLabel = lesson ? lesson.date_time.slice(11, 16) : "--:--"
-                const subjectName = lesson?.modality ?? `Aula #${item.lesson_id}`
+                const subjectName = lesson?.class?.subject?.name ?? lesson?.modality ?? `Aula #${item.lesson_id}`
+                const monitorName = lesson?.class?.monitor
+                  ? `${lesson.class.monitor.first_name} ${lesson.class.monitor.last_name}`
+                  : `Monitor #${lesson?.class_id ?? item.lesson_id}`
                 const isPresent = item.value === true
                 return (
                   <tr
@@ -125,7 +128,7 @@ export function StudentAttendancePage() {
                     <td className="px-6 py-4 text-sm text-slate-600">
                       <div className="flex items-center gap-2">
                         <User className="size-3.5 text-slate-400" />
-                        {item.status === "FINISHED" ? "Finalizado" : "Pendente"}
+                        {monitorName}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">

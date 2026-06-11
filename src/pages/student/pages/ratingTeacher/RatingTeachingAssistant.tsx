@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ChevronLeft, Download, FileText } from "lucide-react"
 import { Link, useLoaderData } from "react-router"
 import type { MaterialsLoaderResult } from "@/loaders/materials.loader"
@@ -14,17 +14,21 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea"
 
 import { Button } from "@/components/ui/button"
 import { StarRating } from "@/components/shared/StarRating"
 
 export default function RatingTeachingAssistant() {
-    const { documents } = useLoaderData<MaterialsLoaderResult>()
+    const { documents, monitorId, existingRating } = useLoaderData<MaterialsLoaderResult>()
     const { submitRating, isLoading } = useRating()
     const [open, setOpen] = useState(false)
     const [nota, setNota] = useState(0)
-    const [comentario, setComentario] = useState("")
+
+    useEffect(() => {
+        if (existingRating) {
+            setNota(existingRating.rate)
+        }
+    }, [existingRating])
 
     const sendRating = () => {
         if (nota === 0) {
@@ -32,10 +36,8 @@ export default function RatingTeachingAssistant() {
             return
         }
 
-        // TODO: o backend requer monitor_id, mas ainda não temos esse dado facilmente disponível no frontend
-        // Precisamos passar o monitor_id correto da turma/aula atual quando o fluxo for integrado com o backend
         const payload = {
-            monitor_id: 0, // placeholder — substituir pelo monitor_id real da turma
+            monitor_id: monitorId,
             rate: nota,
         }
 
@@ -47,7 +49,6 @@ export default function RatingTeachingAssistant() {
 
         setOpen(false)
         setNota(0)
-        setComentario("")
     }
 
     const formatBytes = (bytes: number) => {
@@ -157,15 +158,6 @@ export default function RatingTeachingAssistant() {
                         <p className="text-sm font-medium">Sua avaliacao</p>
 
                         <StarRating value={nota} onChange={setNota} size="lg" />
-
-                        <div className="space-y-1">
-                            <p className="text-sm font-medium">Comentario</p>
-                            <Textarea
-                                value={comentario}
-                                onChange={(e) => setComentario(e.target.value)}
-                                placeholder="Escreva seu feedback"
-                            />
-                        </div>
                     </div>
 
                     <DialogFooter>
