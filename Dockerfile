@@ -2,10 +2,10 @@ FROM node:24-alpine AS build
 
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
+RUN corepack enable
+RUN corepack prepare pnpm@10.33.4 --activate
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm config set onlyBuiltDependencies ""
+
 RUN pnpm install --frozen-lockfile
 
 COPY . .
