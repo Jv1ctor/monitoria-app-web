@@ -1,4 +1,5 @@
 import { WelcomeAdmin } from "./WelcomeAdmin";
+import { AdminMonitorsPage } from "./pages/AdminMonitorsPage";
 
 export const adminRoutes = [
   { index: true, handle: { title: "Início" }, element: <WelcomeAdmin /> },
@@ -13,5 +14,10 @@ export const adminRoutes = [
   //   element: <AdminClassroom />,
   //   handle: { title: "Gerenciar Turmas" },
     
-  // }
+  },
+  {
+    path: "monitors",
+    element: <AdminMonitorsPage />,
+    handle: { title: "Monitores" }
+  }
 ]
