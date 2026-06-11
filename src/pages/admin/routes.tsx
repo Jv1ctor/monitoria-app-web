@@ -1,4 +1,3 @@
-import AdminClassroom from "./AdminClassroom";
 import { WelcomeAdmin } from "./WelcomeAdmin";
 
 export const adminRoutes = [
@@ -9,10 +8,10 @@ export const adminRoutes = [
   //   path: "rota (monitor)",
   //   element: <Pagina />,
   // },
-  {
-    path: "classroom",
-    element: <AdminClassroom />,
-    handle: { title: "Gerenciar Turmas" },
+  // {
+  //   path: "classroom",
+  //   element: <AdminClassroom />,
+  //   handle: { title: "Gerenciar Turmas" },
     
-  }
+  // }
 ]

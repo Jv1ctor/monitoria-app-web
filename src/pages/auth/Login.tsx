@@ -6,7 +6,12 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field"
+import {
+  Field,
+  FieldLabel,
+  FieldError,
+  FieldGroup,
+} from "@/components/ui/field"
 import { Spinner } from "@/components/ui/spinner"
 import { loginSchema } from "@/schemas/auth"
 import { paths } from "@/routes/paths"
@@ -22,7 +27,10 @@ const roleRedirect: Record<Role, string> = {
 export const LoginPage = () => {
   const navigate = useNavigate()
   const { login, isLoading, user } = useAuth()
-  const [formErrors, setFormErrors] = React.useState<{ registration?: string; password?: string }>({})
+  const [formErrors, setFormErrors] = React.useState<{
+    registration?: string
+    password?: string
+  }>({})
   const [globalError, setGlobalError] = React.useState<string>("")
 
   const registrationRef = React.useRef<HTMLInputElement>(null)
@@ -43,7 +51,8 @@ export const LoginPage = () => {
     if (!result.success) {
       const errors: typeof formErrors = {}
       result.error.issues.forEach((issue) => {
-        if (issue.path[0] === "registration") errors.registration = issue.message
+        if (issue.path[0] === "registration")
+          errors.registration = issue.message
         if (issue.path[0] === "password") errors.password = issue.message
       })
       setFormErrors(errors)
@@ -98,15 +107,20 @@ export const LoginPage = () => {
         <CardContent className="p-8">
           <form onSubmit={handleSubmit}>
             <FieldGroup className="gap-5">
-
               <Field>
                 <FieldLabel>Matrícula</FieldLabel>
                 <Input
                   ref={registrationRef}
                   placeholder="Digite sua matrícula"
-                  className={formErrors.registration ? "border-destructive focus-visible:ring-destructive/30" : ""}
+                  className={
+                    formErrors.registration
+                      ? "border-destructive focus-visible:ring-destructive/30"
+                      : ""
+                  }
                 />
-                {formErrors.registration && <FieldError errors={[{ message: formErrors.registration }]} />}
+                {formErrors.registration && (
+                  <FieldError errors={[{ message: formErrors.registration }]} />
+                )}
               </Field>
 
               <Field>
@@ -115,29 +129,21 @@ export const LoginPage = () => {
                   ref={passwordRef}
                   type="password"
                   placeholder="Digite sua senha"
-                  className={formErrors.password ? "border-destructive focus-visible:ring-destructive/30" : ""}
+                  className={
+                    formErrors.password
+                      ? "border-destructive focus-visible:ring-destructive/30"
+                      : ""
+                  }
                 />
-                {formErrors.password && <FieldError errors={[{ message: formErrors.password }]} />}
+                {formErrors.password && (
+                  <FieldError errors={[{ message: formErrors.password }]} />
+                )}
               </Field>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="lembrarMe"
-                    className="size-4 rounded border-input accent-primary cursor-pointer"
-                  />
-                  <label htmlFor="lembrarMe" className="text-xs font-semibold text-foreground select-none cursor-pointer">
-                    Lembrar-me
-                  </label>
-                </div>
-                <NavLink to={paths.recover} className="text-xs font-semibold text-primary hover:underline">
-                  Esqueci minha senha
-                </NavLink>
-              </div>
-
               {globalError && (
-                <p className="text-sm text-destructive font-medium">{globalError}</p>
+                <p className="text-sm text-destructive font-medium">
+                  {globalError}
+                </p>
               )}
 
               <Button type="submit" className="w-full" disabled={isLoading}>
@@ -161,12 +167,14 @@ export const LoginPage = () => {
               <div className="text-center space-y-2">
                 <p className="text-xs text-muted-foreground font-medium">
                   Primeiro acesso?{" "}
-                  <NavLink to={paths.register} className="font-bold text-primary hover:underline">
+                  <NavLink
+                    to={paths.register}
+                    className="font-bold text-primary hover:underline"
+                  >
                     Cadastre-se aqui
                   </NavLink>
                 </p>
               </div>
-
             </FieldGroup>
           </form>
         </CardContent>

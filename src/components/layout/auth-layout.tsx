@@ -16,7 +16,7 @@ const ROLE_NAVS: Record<Role, NavItem[]> = {
   monitor: [
     { label: "Início", path: paths.monitor },
     { label: "Materiais", path: paths.monitorMaterials },
-    { label: "Frequência", path: paths.monitor },
+    { label: "Aulas", path: paths.monitorLessons },
     { label: "Fórum", path: paths.monitorForum },
   ],
   admin: [

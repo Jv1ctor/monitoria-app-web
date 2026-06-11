@@ -21,7 +21,8 @@ export const paths = {
   // monitor
   monitor: "/monitor",
   monitorMaterials: "/monitor/materials",
-  monitorSearch: "/monitor/availableMonitorings",
+  monitorLessons: "/monitor/lessons",
+  monitorSchedule: "/monitor/schedule",
   monitorForum: "/monitor/forum",
 
   // admin
@@ -37,3 +38,6 @@ export const forumByRole: Record<Role, string> = {
 
 // Conteúdos de uma monitoria específica (ex.: "Ver detalhes" / "Ver conteúdo").
 export const studentMaterial = (id: string | number) => `${paths.studentMaterials}/${id}`
+
+// Frequência de uma aula específica do monitor.
+export const monitorAttendance = (lessonId: number) => `/monitor/attendance/${lessonId}`
