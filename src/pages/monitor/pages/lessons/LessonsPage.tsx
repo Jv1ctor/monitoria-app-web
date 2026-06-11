@@ -1,241 +1,352 @@
-import * as React from "react"
-import { CalendarDays, Clock, MapPin, Plus, BookOpen, Pencil, Trash2 } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import { useLoaderData, useRevalidator } from "react-router";
+import { Plus, Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Field, FieldLabel, FieldError } from "@/components/ui/field"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { SectionHeading } from "@/components/shared/SectionHeading"
-import { EmptyState } from "@/components/shared/empty-state"
-import { formatData, formatHora } from "@/lib/data-format.lib"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Field,
+  FieldLabel,
+  FieldError,
+  FieldGroup,
+} from "@/components/ui/field";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
-const MOCK_CLASSES = [
-  { value: "1", label: "Cálculo I — Turma CS101-T1" },
-  { value: "2", label: "Física II — Turma PH201-T2" },
-]
+import { SectionHeading } from "@/components/shared/SectionHeading";
+import { EmptyState } from "@/components/shared/empty-state";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 
-const MOCK_LESSONS = [
-  { id: 1, modality: "PRESENCIAL", date_time: "2026-06-12T14:00:00-03:00", description: "Aula sobre limites", class_id: 1, createdAt: "2026-06-10T10:00:00-03:00", class: { id: 1, code: "CS101-T1", subject: { id: 1, name: "Cálculo I" } } },
-  { id: 2, modality: "REMOTO", date_time: "2026-06-15T10:00:00-03:00", description: "Aula sobre derivadas", class_id: 1, createdAt: "2026-06-10T10:30:00-03:00", class: { id: 1, code: "CS101-T1", subject: { id: 1, name: "Cálculo I" } } },
-  { id: 3, modality: "PRESENCIAL", date_time: "2026-06-20T14:00:00-03:00", description: null, class_id: 2, createdAt: "2026-06-10T11:00:00-03:00", class: { id: 2, code: "PH201-T2", subject: { id: 2, name: "Física II" } } },
-]
+import {
+  createLesson,
+  updateLesson,
+  deleteLesson,
+} from "@/services/lesson.service";
+import { ApiError } from "@/lib/handle-request";
+import { mapFieldErrors, mapApiFieldErrors } from "@/lib/zod-field-errors";
+import { createLessonSchema } from "@/schemas/monitor/lesson.schema";
+import { formatData, formatHora } from "@/lib/data-format.lib";
+import type { MonitorLessonsLoaderResult } from "@/loaders/monitor-lessons.loader";
+
+type FormState = {
+  class_id: string;
+  modality: "REMOTE" | "INPERSON";
+  date_time: string;
+  description: string;
+};
+
+const EMPTY_FORM: FormState = {
+  class_id: "",
+  modality: "REMOTE",
+  date_time: "",
+  description: "",
+};
 
 export function LessonsPage() {
-  const [lessons, setLessons] = React.useState(MOCK_LESSONS)
-  const [formErrors, setFormErrors] = React.useState<Record<string, string>>({})
-  const [classId, setClassId] = React.useState("")
-  const [modality, setModality] = React.useState("")
-  const [date, setDate] = React.useState("")
-  const [time, setTime] = React.useState("")
-  const [location, setLocation] = React.useState("")
-  const [description, setDescription] = React.useState("")
+  const { classes, lessons } =
+    useLoaderData() as MonitorLessonsLoaderResult;
+  const revalidator = useRevalidator();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const errors: Record<string, string> = {}
+  const [isCreateOpen, setIsCreateOpen] = React.useState(false);
+  const [isEditOpen, setIsEditOpen] = React.useState(false);
+  const [editingId, setEditingId] = React.useState<number | null>(null);
+  const [form, setForm] = React.useState<FormState>(EMPTY_FORM);
+  const [formErrors, setFormErrors] = React.useState<Record<string, string>>(
+    {},
+  );
+  const [submitting, setSubmitting] = React.useState(false);
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [deleteTargetId, setDeleteTargetId] = React.useState<number | null>(
+    null,
+  );
 
-    if (!classId) errors.classId = "Selecione a turma."
-    if (!modality) errors.modality = "Selecione a modalidade."
-    if (!date) errors.date = "Informe a data."
-    if (!time) errors.time = "Informe o horário."
-    if (!location || location.trim() === "") errors.location = "Informe a sala ou link."
-
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors)
-      return
+  const onOpenCreate = (open: boolean) => {
+    setIsCreateOpen(open);
+    if (!open) {
+      setForm(EMPTY_FORM);
+      setFormErrors({});
     }
+  };
 
-    setFormErrors({})
-
-    const selectedClass = MOCK_CLASSES.find(c => c.value === classId)
-    const className = selectedClass?.label?.split(" — ")[0] ?? "Monitoria"
-    const classCode = selectedClass?.label?.split(" — ")[1] ?? ""
-
-    const newLesson = {
-      id: Math.max(0, ...lessons.map(l => l.id)) + 1,
-      modality,
-      date_time: `${date}T${time}:00-03:00`,
-      description: description || null,
-      class_id: Number(classId),
-      createdAt: new Date().toISOString(),
-      class: { id: Number(classId), code: classCode, subject: { id: Number(classId), name: className } },
+  const onOpenEdit = (open: boolean) => {
+    setIsEditOpen(open);
+    if (!open) {
+      setForm(EMPTY_FORM);
+      setFormErrors({});
+      setEditingId(null);
     }
+  };
 
-    setLessons([...lessons, newLesson])
-    toast.success("Aula criada com sucesso!")
+  const openEdit = (lessonId: number) => {
+    const lesson = lessons.find((l) => l.id === lessonId);
+    if (!lesson) return;
+    setEditingId(lessonId);
+    setForm({
+      class_id: String(lesson.class_id),
+      modality: lesson.modality as "REMOTE" | "INPERSON",
+      date_time: new Date(lesson.date_time).toISOString().slice(0, 16),
+      description: lesson.description ?? "",
+    });
+    setFormErrors({});
+    setIsEditOpen(true);
+  };
 
-    setClassId("")
-    setModality("")
-    setDate("")
-    setTime("")
-    setLocation("")
-    setDescription("")
-  }
+  const submit = async (mode: "create" | "edit") => {
+    const parsed = createLessonSchema.safeParse(form);
+    if (!parsed.success) {
+      setFormErrors(mapFieldErrors(parsed.error));
+      return;
+    }
+    setFormErrors({});
+    setSubmitting(true);
+    try {
+      if (mode === "create") {
+        await createLesson({
+          class_id: parsed.data.class_id,
+          modality: parsed.data.modality,
+          date_time: new Date(parsed.data.date_time).toISOString(),
+          description: parsed.data.description,
+        });
+        toast.success("Aula criada com sucesso!");
+        onOpenCreate(false);
+      } else if (editingId !== null) {
+        await updateLesson(editingId, {
+          modality: parsed.data.modality,
+          date_time: new Date(parsed.data.date_time).toISOString(),
+          description: parsed.data.description,
+        });
+        toast.success("Aula atualizada!");
+        onOpenEdit(false);
+      }
+      revalidator.revalidate();
+    } catch (e) {
+      if (e instanceof ApiError) {
+        if (e.fieldErrors.length) {
+          setFormErrors(mapApiFieldErrors(e.fieldErrors));
+        } else {
+          toast.error(e.message || "Erro ao salvar");
+        }
+      } else {
+        toast.error("Erro inesperado");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-  const handleDelete = (id: number) => {
-    setLessons(current => current.filter(l => l.id !== id))
-    toast.success("Aula removida!")
-  }
+  const onDelete = async () => {
+    if (deleteTargetId === null) return;
+    try {
+      await deleteLesson(deleteTargetId);
+      toast.success("Aula excluída!");
+      revalidator.revalidate();
+    } catch (e) {
+      const msg = e instanceof ApiError ? e.message : "Erro ao excluir";
+      toast.error(msg);
+    } finally {
+      setDeleteOpen(false);
+    }
+  };
 
   return (
-    <div className="max-w-5xl mx-auto py-8 px-6 w-full">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground tracking-tight">Aulas</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Gerencie as aulas das suas turmas e registre frequência.
-        </p>
-      </div>
-
-      <Card className="shadow-sm border-border mb-10">
-        <CardContent className="p-6">
-          <h2 className="text-base font-bold text-foreground mb-4">Nova Aula</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-              <Field className="md:col-span-2">
-                <FieldLabel>Turma</FieldLabel>
-                <Select onValueChange={setClassId} value={classId}>
-                  <SelectTrigger className={formErrors.classId ? "border-destructive" : ""}>
-                    <SelectValue placeholder="Selecione a turma..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {MOCK_CLASSES.map(c => (
-                      <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {formErrors.classId && <FieldError errors={[{ message: formErrors.classId }]} />}
-              </Field>
-
-              <Field>
-                <FieldLabel>Modalidade</FieldLabel>
-                <Select onValueChange={setModality} value={modality}>
-                  <SelectTrigger className={formErrors.modality ? "border-destructive" : ""}>
-                    <SelectValue placeholder="Selecione..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="PRESENCIAL">Presencial</SelectItem>
-                    <SelectItem value="REMOTO">Online</SelectItem>
-                  </SelectContent>
-                </Select>
-                {formErrors.modality && <FieldError errors={[{ message: formErrors.modality }]} />}
-              </Field>
-
-              <Field>
-                <FieldLabel>Sala / Link</FieldLabel>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+    <div className="max-w-6xl mx-auto py-8 px-6 w-full">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-8 gap-4">
+        <SectionHeading title="Aulas" meta="Crie e gerencie suas aulas." />
+        <Dialog open={isCreateOpen} onOpenChange={onOpenCreate}>
+          <DialogTrigger asChild>
+            <Button className="bg-[#0047BA] hover:bg-[#003a99] text-white">
+              <Plus className="mr-2 size-4" />
+              Nova Aula
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader className="mb-2">
+              <DialogTitle>Nova Aula</DialogTitle>
+              <DialogDescription>Preencha os dados da aula.</DialogDescription>
+            </DialogHeader>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                submit("create");
+              }}
+            >
+              <FieldGroup className="gap-5">
+                <Field>
+                  <FieldLabel>Turma</FieldLabel>
+                  <Select
+                    value={form.class_id}
+                    onValueChange={(v) => setForm({ ...form, class_id: v })}
+                  >
+                    <SelectTrigger
+                      className={
+                        formErrors.class_id ? "border-destructive" : ""
+                      }
+                    >
+                      <SelectValue placeholder="Selecione..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {classes.map((c) => (
+                        <SelectItem key={c.id} value={String(c.id)}>
+                          {c.code}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {formErrors.class_id && (
+                    <FieldError
+                      errors={[{ message: formErrors.class_id }]}
+                    />
+                  )}
+                </Field>
+                <Field>
+                  <FieldLabel>Modalidade</FieldLabel>
+                  <Select
+                    value={form.modality}
+                    onValueChange={(v) =>
+                      setForm({
+                        ...form,
+                        modality: v as "REMOTE" | "INPERSON",
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="REMOTE">Remota</SelectItem>
+                      <SelectItem value="INPERSON">Presencial</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field>
+                  <FieldLabel>Data e hora</FieldLabel>
                   <Input
-                    placeholder="Ex: C-201 ou https://meet.google.com/..."
-                    value={location}
-                    onChange={e => setLocation(e.target.value)}
-                    className={`pl-10 ${formErrors.location ? "border-destructive" : ""}`}
+                    type="datetime-local"
+                    value={form.date_time}
+                    onChange={(e) =>
+                      setForm({ ...form, date_time: e.target.value })
+                    }
+                    className={
+                      formErrors.date_time ? "border-destructive" : ""
+                    }
                   />
-                </div>
-                {formErrors.location && <FieldError errors={[{ message: formErrors.location }]} />}
-              </Field>
-
-              <Field>
-                <FieldLabel>Data</FieldLabel>
-                <div className="relative">
-                  <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-                  <Input
-                    type="date"
-                    value={date}
-                    onChange={e => setDate(e.target.value)}
-                    className={`pl-10 ${formErrors.date ? "border-destructive" : ""}`}
-                  />
-                </div>
-                {formErrors.date && <FieldError errors={[{ message: formErrors.date }]} />}
-              </Field>
-
-              <Field>
-                <FieldLabel>Horário</FieldLabel>
-                <div className="relative">
-                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-                  <Input
-                    type="time"
-                    value={time}
-                    onChange={e => setTime(e.target.value)}
-                    className={`pl-10 ${formErrors.time ? "border-destructive" : ""}`}
-                  />
-                </div>
-                {formErrors.time && <FieldError errors={[{ message: formErrors.time }]} />}
-              </Field>
-
-              <Field className="md:col-span-2">
-                <FieldLabel>Descrição (opcional)</FieldLabel>
-                <div className="relative">
-                  <BookOpen className="absolute left-3 top-3 size-4 text-muted-foreground pointer-events-none" />
+                  {formErrors.date_time && (
+                    <FieldError
+                      errors={[{ message: formErrors.date_time }]}
+                    />
+                  )}
+                </Field>
+                <Field>
+                  <FieldLabel>Descrição (opcional)</FieldLabel>
                   <Textarea
-                    placeholder="Ex: Aula sobre derivadas e aplicações..."
-                    value={description}
-                    onChange={e => setDescription(e.target.value)}
-                    className="pl-10 min-h-[80px]"
+                    value={form.description}
+                    onChange={(e) =>
+                      setForm({ ...form, description: e.target.value })
+                    }
+                    placeholder="Conteúdo da aula"
                   />
+                  {formErrors.description && (
+                    <FieldError
+                      errors={[{ message: formErrors.description }]}
+                    />
+                  )}
+                </Field>
+                <div className="flex justify-end gap-3 mt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => onOpenCreate(false)}
+                    disabled={submitting}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="bg-[#0047BA] hover:bg-[#003a99]"
+                    disabled={submitting}
+                  >
+                    {submitting ? "Salvando..." : "Salvar"}
+                  </Button>
                 </div>
-              </Field>
-            </div>
-
-            <div className="flex justify-end mt-6">
-              <Button type="submit" className="bg-[#0047BA] hover:bg-[#003a99] text-white">
-                <Plus className="mr-2 size-4" />
-                Criar Aula
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-
-      <SectionHeading title="Aulas cadastradas" meta={`${lessons.length} aula(s)`} />
+              </FieldGroup>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
 
       {lessons.length === 0 ? (
         <EmptyState
           title="Nenhuma aula cadastrada"
-          description="Crie sua primeira aula usando o formulário acima."
-          icon={<BookOpen className="size-8" />}
+          description="Crie a primeira aula para começar."
         />
       ) : (
         <Table>
           <TableHeader className="bg-muted/30">
             <TableRow>
-              <TableHead className="text-xs font-bold text-muted-foreground uppercase">Turma</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground uppercase">Modalidade</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground uppercase">Data</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground uppercase">Horário</TableHead>
-              <TableHead className="text-right text-xs font-bold text-muted-foreground uppercase pr-6">Ações</TableHead>
+              <TableHead>Turma</TableHead>
+              <TableHead>Modalidade</TableHead>
+              <TableHead>Data</TableHead>
+              <TableHead>Horário</TableHead>
+              <TableHead>Descrição</TableHead>
+              <TableHead className="text-right pr-6">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {lessons.map((lesson) => (
-              <TableRow key={lesson.id}>
-                <TableCell className="font-medium text-sm">
-                  {lesson.class?.subject?.name ?? "Monitoria"}
+            {lessons.map((l) => (
+              <TableRow key={l.id}>
+                <TableCell className="font-medium">
+                  {l.class?.code ?? l.class_id}
                 </TableCell>
                 <TableCell>
-                  <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase ${
-                    lesson.modality === "PRESENCIAL"
-                      ? "bg-blue-100 text-blue-600"
-                      : "bg-green-100 text-green-600"
-                  }`}>
-                    {lesson.modality === "PRESENCIAL" ? "Presencial" : "Online"}
-                  </span>
+                  {l.modality === "REMOTE" ? "Remota" : "Presencial"}
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground">{formatData(lesson.date_time)}</TableCell>
-                <TableCell className="text-sm text-muted-foreground">{formatHora(lesson.date_time)}</TableCell>
+                <TableCell>{formatData(l.date_time)}</TableCell>
+                <TableCell>{formatHora(l.date_time)}</TableCell>
+                <TableCell className="max-w-xs truncate">
+                  {l.description ?? "—"}
+                </TableCell>
                 <TableCell className="text-right pr-6">
                   <div className="flex items-center justify-end gap-2">
-                    <Button variant="outline" size="icon" className="size-8 text-muted-foreground hover:text-foreground" title="Editar">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="size-8"
+                      onClick={() => openEdit(l.id)}
+                      title="Editar"
+                    >
                       <Pencil className="size-4" />
                     </Button>
                     <Button
                       variant="outline"
                       size="icon"
-                      className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:border-destructive/20"
-                      onClick={() => handleDelete(lesson.id)}
+                      className="size-8 text-muted-foreground hover:text-destructive"
+                      onClick={() => {
+                      setDeleteTargetId(l.id);
+                      setDeleteOpen(true);
+                    }}
                       title="Excluir"
                     >
                       <Trash2 className="size-4" />
@@ -247,6 +358,120 @@ export function LessonsPage() {
           </TableBody>
         </Table>
       )}
+
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title="Excluir esta aula?"
+        description="Esta ação não pode ser desfeita."
+        onConfirm={onDelete}
+      />
+
+      <Dialog open={isEditOpen} onOpenChange={onOpenEdit}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="mb-2">
+            <DialogTitle>Editar Aula</DialogTitle>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              submit("edit");
+            }}
+          >
+            <FieldGroup className="gap-5">
+              <Field>
+                <FieldLabel>Turma</FieldLabel>
+                <Select
+                  value={form.class_id}
+                  onValueChange={(v) => setForm({ ...form, class_id: v })}
+                >
+                  <SelectTrigger
+                    className={
+                      formErrors.class_id ? "border-destructive" : ""
+                    }
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {classes.map((c) => (
+                      <SelectItem key={c.id} value={String(c.id)}>
+                        {c.code}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {formErrors.class_id && (
+                  <FieldError errors={[{ message: formErrors.class_id }]} />
+                )}
+              </Field>
+              <Field>
+                <FieldLabel>Modalidade</FieldLabel>
+                <Select
+                  value={form.modality}
+                  onValueChange={(v) =>
+                    setForm({
+                      ...form,
+                      modality: v as "REMOTE" | "INPERSON",
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="REMOTE">Remota</SelectItem>
+                    <SelectItem value="INPERSON">Presencial</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field>
+                <FieldLabel>Data e hora</FieldLabel>
+                <Input
+                  type="datetime-local"
+                  value={form.date_time}
+                  onChange={(e) =>
+                    setForm({ ...form, date_time: e.target.value })
+                  }
+                />
+                {formErrors.date_time && (
+                  <FieldError errors={[{ message: formErrors.date_time }]} />
+                )}
+              </Field>
+              <Field>
+                <FieldLabel>Descrição (opcional)</FieldLabel>
+                <Textarea
+                  value={form.description}
+                  onChange={(e) =>
+                    setForm({ ...form, description: e.target.value })
+                  }
+                />
+                {formErrors.description && (
+                  <FieldError
+                    errors={[{ message: formErrors.description }]}
+                  />
+                )}
+              </Field>
+              <div className="flex justify-end gap-3 mt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenEdit(false)}
+                  disabled={submitting}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-[#0047BA] hover:bg-[#003a99]"
+                  disabled={submitting}
+                >
+                  {submitting ? "Salvando..." : "Atualizar"}
+                </Button>
+              </div>
+            </FieldGroup>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
-  )
+  );
 }

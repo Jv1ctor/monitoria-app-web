@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react"
-import { ChevronLeft, Download, FileText } from "lucide-react"
+import { ChevronLeft, Download, Eye, FileText } from "lucide-react"
 import { Link, useLoaderData } from "react-router"
 import type { MaterialsLoaderResult } from "@/loaders/materials.loader"
 import { paths } from "@/routes/paths"
 import { toast } from "sonner"
+import { getSignedDownloadAndPreview } from "@/services/document.service"
 import { useRating } from "@/hooks/use-rating.hook"
 
 import {
@@ -23,6 +24,7 @@ export default function RatingTeachingAssistant() {
     const { submitRating, isLoading } = useRating()
     const [open, setOpen] = useState(false)
     const [nota, setNota] = useState(0)
+    const [loadingKey, setLoadingKey] = useState<string | null>(null)
 
     useEffect(() => {
         if (existingRating) {
@@ -134,7 +136,40 @@ export default function RatingTeachingAssistant() {
                                                 {extLabel} - {sizeLabel}
                                             </span>
                                             <span className="text-xs text-muted-foreground">{dateLabel}</span>
-                                            <Button size="sm">
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                disabled={loadingKey === material.key}
+                                                onClick={async () => {
+                                                    setLoadingKey(material.key)
+                                                    try {
+                                                        const { preview_url } = await getSignedDownloadAndPreview(material.key)
+                                                        window.open(preview_url, "_blank")
+                                                    } catch (e) {
+                                                        toast.error("Erro ao visualizar")
+                                                    } finally {
+                                                        setLoadingKey(null)
+                                                    }
+                                                }}
+                                            >
+                                                <Eye className="size-4" />
+                                                Visualizar
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                disabled={loadingKey === material.key}
+                                                onClick={async () => {
+                                                    setLoadingKey(material.key)
+                                                    try {
+                                                        const { download_url } = await getSignedDownloadAndPreview(material.key)
+                                                        window.open(download_url, "_blank")
+                                                    } catch (e) {
+                                                        toast.error("Erro ao baixar")
+                                                    } finally {
+                                                        setLoadingKey(null)
+                                                    }
+                                                }}
+                                            >
                                                 <Download className="size-4" />
                                                 Baixar
                                             </Button>
